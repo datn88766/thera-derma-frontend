@@ -1,0 +1,168 @@
+{
+  "nav": {
+    "home": "Trang chủ",
+    "services": "Dịch vụ",
+    "science": "Khoa học",
+    "philosophy": "Triết lý",
+    "contact": "Liên hệ",
+    "bookNow": "Đặt Lịch"
+  },
+  "hero": {
+    "topBadge": "Da liễu lâm sàng · Wellness cao cấp",
+    "title1": "Nơi Khoa Học",
+    "title2": "Gặp Gỡ",
+    "title3": "Bình Yên",
+    "subtitle": "Trải nghiệm các liệu trình da liễu đột phá và nghi lễ spa phục hồi, được thực hiện với sự tỉ mỉ trong bầu không khí tuyệt đối an yên.",
+    "cta1": "Bắt đầu hành trình",
+    "cta2": "Khám phá dịch vụ",
+    "stat1label": "3000+ Khách hàng",
+    "stat1sub": "Đã điều trị",
+    "stat2label": "Đánh giá 5 sao",
+    "stat2sub": "Trải nghiệm",
+    "stat3label": "Địa điểm",
+    "stat3sub": "Cao cấp"
+  },
+  "marquee": ["Làm sạch sâu", "Chống lão hoá", "Phục hồi da", "Công nghệ nano", "Vàng 24K", "Không xâm lấn", "Da sáng khoẻ"],
+  "services": {
+    "badge": "Dịch Vụ Nổi Bật",
+    "tagline": "Không xâm lấn · Không lột tẩy · Không tạo tổn thương",
+    "viewAll": "Xem tất cả dịch vụ",
+    "collapse": "Thu gọn",
+    "book": "Đặt lịch",
+    "edit": "Chỉnh sửa",
+    "detail": "Chi tiết",
+    "category": "Facial"
+  },
+  "clinical": {
+    "tagline": "Khoa học đằng sau vẻ đẹp",
+    "title1": "Chính xác lâm sàng,",
+    "title2": "Kết quả tự nhiên",
+    "features": [
+      {
+        "title": "Công nghệ tiên tiến",
+        "desc": "Thiết bị da liễu hiện đại mang lại các liệu trình chính xác với kết quả đo lường được và lâu dài."
+      },
+      {
+        "title": "Sản phẩm chuẩn lâm sàng",
+        "desc": "Công thức dược phẩm chất lượng cao, được kiểm định và chứng nhận hữu cơ để đảm bảo hiệu quả và an toàn tối đa."
+      },
+      {
+        "title": "Triết lý hữu cơ",
+        "desc": "Không sulfate, không paraben, không thử nghiệm động vật. Chỉ sử dụng chiết xuất thực vật và thành phần hoạt tính sinh học thuần khiết nhất."
+      },
+      {
+        "title": "Chuyên gia hàng đầu",
+        "desc": "Bác sĩ da liễu được chứng nhận và chuyên viên thẩm mỹ có hàng chục năm kinh nghiệm kết hợp."
+      }
+    ]
+  },
+  "philosophy": {
+    "badge": "Triết lý của chúng tôi",
+    "title1": "Thuần khiết & Mạnh mẽ,",
+    "title2": "Tự nhiên",
+    "body1": "Tại Thera Derma, chúng tôi chỉ sử dụng sản phẩm đã được kiểm định lâm sàng, không thử nghiệm trên động vật và được chứng nhận hữu cơ. Cam kết làm đẹp thuần khiết đảm bảo làn da bạn chỉ nhận những dưỡng chất tinh khiết nhất.",
+    "body2": "Mỗi công thức được các bác sĩ da liễu lựa chọn kỹ lưỡng, cân bằng giữa hoạt chất lâm sàng mạnh mẽ và sự nhẹ nhàng của chiết xuất thực vật.",
+    "badges": ["Không thử động vật", "Không Sulfate", "Hữu cơ", "Kiểm định phòng lab", "Không SLS", "Không Silicon", "Không Cồn", "Không Paraben"]
+  },
+  "whyChoose": {
+    "tagline": "Sự khác biệt của Thera Derma",
+    "title": "Tại sao chọn",
+    "reasons": [
+      {
+        "kicker": "Công nghệ hoàn hảo",
+        "title": "Đỉnh cao công nghệ",
+        "desc": "Thiết bị hiện đại mang lại liệu trình với độ chính xác vượt trội, đảm bảo kết quả rõ rệt và lâu dài ngay từ lần điều trị đầu tiên."
+      },
+      {
+        "kicker": "Chuyên gia hàng đầu",
+        "title": "Bàn tay của bậc thầy",
+        "desc": "Đội ngũ của chúng tôi gồm những chuyên gia được tìm kiếm nhiều nhất, mỗi người là bậc thầy trong lĩnh vực của mình, tận tâm mang lại sự chăm sóc sâu sắc và cá nhân hóa."
+      },
+      {
+        "kicker": "Không gian tuyệt đối",
+        "title": "Ốc đảo bình yên",
+        "desc": "Mọi chi tiết, từ ánh sáng nhẹ nhàng đến âm nhạc thanh thản, đều được chọn lọc kỹ lưỡng để mang lại sự thoải mái và thoát khỏi nhịp sống thường ngày."
+      }
+    ]
+  },
+  "testimonials": {
+    "tagline": "Trải nghiệm khách hàng",
+    "title1": "Những lời",
+    "title2": "Tri ân",
+    "items": [
+      {
+        "name": "Nguyễn Thị Lan",
+        "text": "Liệu trình Hydra Facial thực sự thay đổi hoàn toàn. Da tôi chưa bao giờ rạng rỡ đến vậy. Toàn bộ trải nghiệm, từ khi bước vào, là sự xa hoa thuần túy.",
+        "treatment": "Hydra Facial"
+      },
+      {
+        "name": "Trần Minh Châu",
+        "text": "Tôi đã thử nhiều spa khắp nơi, và Thera Derma thực sự đẳng cấp riêng. Sự chú ý đến từng chi tiết, sản phẩm họ sử dụng — tất cả đều đẳng cấp thế giới.",
+        "treatment": "Massage thư giãn"
+      },
+      {
+        "name": "Phạm Thị Hoa",
+        "text": "Korean Head Spa là trải nghiệm tôi không biết mình cần đến khi nào. Cực kỳ thư giãn và sức khỏe da đầu của tôi đã cải thiện đáng kể. Rất đáng trải nghiệm.",
+        "treatment": "Korean Head Spa"
+      }
+    ]
+  },
+  "booking": {
+    "badge": "Đặt Lịch Hẹn",
+    "title": "Bắt đầu",
+    "title2": "Hành trình của bạn",
+    "name": "Họ và tên",
+    "namePlaceholder": "Tên của bạn",
+    "email": "Email",
+    "phone": "Số điện thoại",
+    "phonePlaceholder": "0xxx xxx xxx",
+    "treatment": "Dịch vụ",
+    "treatmentPlaceholder": "Chọn dịch vụ",
+    "date": "Ngày hẹn",
+    "chooseDatePlaceholder": "Chọn ngày",
+    "time": "Giờ hẹn",
+    "continue": "Tiếp tục",
+    "back": "Quay lại",
+    "submit": "Xác nhận đặt lịch",
+    "thankYou": "Cảm ơn,",
+    "confirmMsg": "Yêu cầu đặt lịch dịch vụ {treatment} vào ngày {date} lúc {time} đã được nhận. Chúng tôi sẽ xác nhận qua điện thoại.",
+    "errorRequired": "Vui lòng điền đầy đủ các trường bắt buộc",
+    "successMsg": "Yêu cầu đặt lịch đã được gửi!",
+    "treatments": [
+      "Hydra Facial", "Massage thư giãn", "Peel hoá học", "Korean Head Spa",
+      "Liệu trình ánh sáng LED", "Massage trị liệu", "BB Glow", "Vi kim",
+      "Hair Botox", "Chăm sóc da đầu", "Tạo dáng lông mày", "Nối lông mi"
+    ]
+  },
+  "footer": {
+    "brandDesc": "Nơi da liễu lâm sàng gặp wellness cao cấp. Liệu trình đột phá được thực hiện tỉ mỉ trong bầu không khí tuyệt đối an yên.",
+    "quickLinks": "Liên kết nhanh",
+    "links": [
+      { "label": "Trang chủ", "href": "#hero" },
+      { "label": "Dịch vụ", "href": "#services" },
+      { "label": "Khoa học", "href": "#science" },
+      { "label": "Triết lý", "href": "#philosophy" },
+      { "label": "Đặt lịch", "href": "#booking" }
+    ],
+    "treatments": "Dịch vụ",
+    "treatmentList": ["Facial", "Derma Science"],
+    "contact": "Liên hệ",
+    "phone": "+84 xxx xxx xxx",
+    "email": "hello@theraderma.com",
+    "address": "Địa điểm cao cấp",
+    "hours": "Hàng ngày 10:00 - 20:00",
+    "tagline": "Được chăm chút vì sức khoẻ của bạn",
+    "rights": "© 2026 Thera Derma. Mọi quyền được bảo lưu."
+  },
+  "chat": {
+    "greeting": "Xin chào! Tôi là trợ lý của Thera Derma. Tôi có thể giúp bạn tìm hiểu về các liệu trình Facial, tư vấn dịch vụ phù hợp, hoặc hỗ trợ đặt lịch hẹn. ✨",
+    "placeholder": "Nhập câu hỏi của bạn...",
+    "consultant": "Trợ lý tư vấn",
+    "prompts": [
+      "Dịch vụ Facial phù hợp với da tôi?",
+      "Giá các gói Facial là bao nhiêu?",
+      "Đặt lịch hẹn như thế nào?",
+      "Liệu trình 24K Gold có tác dụng gì?"
+    ]
+  }
+}

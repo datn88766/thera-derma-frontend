@@ -1,0 +1,168 @@
+{
+  "nav": {
+    "home": "Home",
+    "services": "Services",
+    "science": "Science",
+    "philosophy": "Philosophy",
+    "contact": "Contact",
+    "bookNow": "Book Now"
+  },
+  "hero": {
+    "topBadge": "Clinical Dermatology · Luxury Wellness",
+    "title1": "Where Science",
+    "title2": "Meets",
+    "title3": "Serenity",
+    "subtitle": "Experience transformative dermatological treatments and restorative spa rituals, crafted with precision and delivered in an atmosphere of absolute tranquility.",
+    "cta1": "Begin Your Journey",
+    "cta2": "Explore Treatments",
+    "stat1label": "3000+ Clients",
+    "stat1sub": "Treated",
+    "stat2label": "5-Star Rated",
+    "stat2sub": "Experience",
+    "stat3label": "Premium",
+    "stat3sub": "Location"
+  },
+  "marquee": ["Deep Cleanse", "Anti-Aging", "Skin Repair", "Nano Technology", "24K Gold", "Non-Invasive", "Radiant Skin"],
+  "services": {
+    "badge": "Featured Services",
+    "tagline": "Non-invasive · No peeling · No damage",
+    "viewAll": "View all services",
+    "collapse": "Collapse",
+    "book": "Book Now",
+    "edit": "Edit",
+    "detail": "Details",
+    "category": "Facial"
+  },
+  "clinical": {
+    "tagline": "The Science Behind Beauty",
+    "title1": "Clinical Precision,",
+    "title2": "Natural Results",
+    "features": [
+      {
+        "title": "Advanced Technology",
+        "desc": "State-of-the-art dermatological equipment delivering precision treatments with measurable, lasting results."
+      },
+      {
+        "title": "Clinical-Grade Products",
+        "desc": "Pharmaceutical-quality formulations, lab-tested and certified organic for maximum efficacy and safety."
+      },
+      {
+        "title": "Organic Philosophy",
+        "desc": "Sulfate-free, paraben-free, cruelty-free. Only the purest botanical extracts and bioactive ingredients."
+      },
+      {
+        "title": "Expert Practitioners",
+        "desc": "Board-certified dermatologists and licensed aestheticians with decades of combined expertise."
+      }
+    ]
+  },
+  "philosophy": {
+    "badge": "Our Philosophy",
+    "title1": "Purely Potent,",
+    "title2": "Naturally",
+    "body1": "At Thera Derma, we exclusively use lab-tested, cruelty-free, and certified organic products. Our commitment to clean beauty ensures your skin receives only the purest ingredients for truly radiant, healthy results.",
+    "body2": "Every formulation is meticulously selected by our dermatologists, balancing the potency of clinical-grade actives with the gentleness of botanical extracts.",
+    "badges": ["Cruelty Free", "Sulfate Free", "Organic", "Lab Tested", "No SLS", "No Silicon", "No Alcohol", "Paraben Free"]
+  },
+  "whyChoose": {
+    "tagline": "The Thera Derma Difference",
+    "title": "Why Choose",
+    "reasons": [
+      {
+        "kicker": "Flawless Precision",
+        "title": "The Pinnacle of Technology",
+        "desc": "State-of-the-art equipment delivers treatments with unparalleled accuracy, ensuring visible, lasting results from your very first visit."
+      },
+      {
+        "kicker": "Elite Therapists",
+        "title": "The Touch of Mastery",
+        "desc": "Our team comprises the most sought-after experts, each a master of their craft, dedicated to deeply restorative and personalized care."
+      },
+      {
+        "kicker": "Absolute Sanctuary",
+        "title": "An Oasis of Calm",
+        "desc": "Every detail, from the ambient lighting to the serene music, is curated for your ultimate comfort and escape from the everyday."
+      }
+    ]
+  },
+  "testimonials": {
+    "tagline": "Guest Experiences",
+    "title1": "Words of",
+    "title2": "Gratitude",
+    "items": [
+      {
+        "name": "Ananya Sharma",
+        "text": "The Hydra Facial treatment was absolutely transformative. My skin has never looked this radiant. The entire experience, from the moment I walked in, was pure luxury.",
+        "treatment": "Hydra Facial"
+      },
+      {
+        "name": "Priya Desai",
+        "text": "I've tried spas across the country, and Thera Derma is truly in a league of its own. The attention to detail, the products they use — everything is world-class.",
+        "treatment": "Deep Tissue Massage"
+      },
+      {
+        "name": "Rahul Mehta",
+        "text": "The Korean Head Spa was an experience I didn't know I needed. Incredibly relaxing and my scalp health has improved dramatically. Highly recommend.",
+        "treatment": "Korean Head Spa"
+      }
+    ]
+  },
+  "booking": {
+    "badge": "Reserve Your Experience",
+    "title": "Begin Your",
+    "title2": "Transformation",
+    "name": "Full Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "phone": "Phone Number",
+    "phonePlaceholder": "+91 XXXXX XXXXX",
+    "treatment": "Treatment",
+    "treatmentPlaceholder": "Select a treatment",
+    "date": "Select Date",
+    "chooseDatePlaceholder": "Choose a date",
+    "time": "Preferred Time",
+    "continue": "Continue",
+    "back": "Back",
+    "submit": "Confirm Booking",
+    "thankYou": "Thank You,",
+    "confirmMsg": "Your appointment request for {treatment} on {date} at {time} has been received. We'll confirm via phone shortly.",
+    "errorRequired": "Please fill in all required fields",
+    "successMsg": "Your appointment has been requested!",
+    "treatments": [
+      "Hydra Facial", "Deep Tissue Massage", "Chemical Peel", "Korean Head Spa",
+      "LED Light Therapy", "Aromatherapy Massage", "BB Glow Treatment", "Micro-needling",
+      "Hair Botox", "Scalp Therapy", "Brow Sculpting", "Lash Extensions"
+    ]
+  },
+  "footer": {
+    "brandDesc": "Where clinical dermatology meets luxury wellness. Transformative treatments crafted with precision, delivered in an atmosphere of absolute tranquility.",
+    "quickLinks": "Quick Links",
+    "links": [
+      { "label": "Home", "href": "#hero" },
+      { "label": "Services", "href": "#services" },
+      { "label": "Science", "href": "#science" },
+      { "label": "Philosophy", "href": "#philosophy" },
+      { "label": "Book Now", "href": "#booking" }
+    ],
+    "treatments": "Treatments",
+    "treatmentList": ["Facial", "Derma Science"],
+    "contact": "Get In Touch",
+    "phone": "+91 XXXXX XXXXX",
+    "email": "hello@theraderma.com",
+    "address": "Premium Location",
+    "hours": "Daily 10:00 AM - 8:00 PM",
+    "tagline": "Crafted with care for your well-being",
+    "rights": "© 2026 Thera Derma. All rights reserved."
+  },
+  "chat": {
+    "greeting": "Hello! I'm the Thera Derma assistant. I can help you learn about Facial treatments, recommend the right service for your skin, or help you book an appointment. ✨",
+    "placeholder": "Type your question...",
+    "consultant": "Consultation Assistant",
+    "prompts": [
+      "Which Facial is right for my skin?",
+      "What are the Facial package prices?",
+      "How do I book an appointment?",
+      "What does the 24K Gold treatment do?"
+    ]
+  }
+}
