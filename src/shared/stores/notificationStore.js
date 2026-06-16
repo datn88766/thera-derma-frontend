@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { io } from 'socket.io-client';
-import { getToken } from '@/api/client';
+import { getApiOrigin, getToken } from '@/api/client';
 import { base44 } from '@/api/entities';
 
 export const useNotificationStore = create((set, get) => ({
@@ -19,7 +19,7 @@ export const useNotificationStore = create((set, get) => ({
 
   connect(userId) {
     if (!userId || get().socket) return;
-    const socket = io(`${window.location.origin}/notifications`, {
+    const socket = io(`${getApiOrigin()}/notifications`, {
       path: '/socket.io',
       auth: { token: getToken() },
       transports: ['websocket', 'polling'],

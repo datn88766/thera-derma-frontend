@@ -1,7 +1,12 @@
+import { buildApiUrl } from './apiBase';
+
 const TOKEN_KEY = 'theraderma_access_token';
 const REFRESH_KEY = 'theraderma_refresh_token';
 
 const PROTECTED_PREFIXES = ['/admin', '/staff', '/manager', '/customer', '/account'];
+
+export { buildApiUrl, getApiBase, getApiOrigin, resolveUploadsUrl } from './apiBase';
+export { resolveUploadsUrl as resolvePublicUploadsUrl } from './apiBase';
 
 export function getToken() {
   return localStorage.getItem(TOKEN_KEY);
@@ -40,7 +45,7 @@ async function refreshAccessToken() {
   if (!refreshToken) return null;
 
   if (!refreshPromise) {
-    refreshPromise = fetch('/api/auth/refresh', {
+    refreshPromise = fetch(buildApiUrl('/auth/refresh'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -100,7 +105,7 @@ export async function apiRequest(path, options = {}) {
     const token = getToken();
     if (token) headers.Authorization = `Bearer ${token}`;
 
-    return fetch(`/api${path}`, {
+    return fetch(buildApiUrl(path), {
       ...options,
       headers,
       body: options.body !== undefined ? JSON.stringify(options.body) : undefined,

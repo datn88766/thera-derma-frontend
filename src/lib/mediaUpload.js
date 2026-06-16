@@ -1,4 +1,4 @@
-import { getToken } from '@/api/client';
+import { buildApiUrl, getToken, resolveUploadsUrl } from '@/api/client';
 
 export const CATALOG_IMAGE_ACCEPT =
   '.jpg,.jpeg,.png,.webp,.gif,.bmp,.tif,.tiff,.svg,.avif,.heic,.ico,image/*';
@@ -6,13 +6,7 @@ export const CATALOG_IMAGE_ACCEPT =
 export const CATALOG_VIDEO_ACCEPT = 'video/mp4,video/webm,video/ogg,video/quicktime,.mp4,.webm,.mov';
 
 export function resolveMediaUrl(url) {
-  if (!url) return '';
-  const value = String(url).trim();
-  if (value.startsWith('http') || value.startsWith('blob:') || value.startsWith('data:')) {
-    return value;
-  }
-  if (value.startsWith('/uploads/')) return value;
-  return value;
+  return resolveUploadsUrl(url);
 }
 
 function parseUploadResponse(payload, response) {
@@ -33,7 +27,7 @@ export async function uploadCatalogImage(file) {
   const formData = new FormData();
   formData.append('image', file);
 
-  const response = await fetch('/api/upload/blog-thumbnail', {
+  const response = await fetch(buildApiUrl('/upload/blog-thumbnail'), {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
@@ -49,7 +43,7 @@ export async function uploadCatalogMedia(file) {
   const formData = new FormData();
   formData.append('media', file);
 
-  const response = await fetch('/api/upload/blog-media', {
+  const response = await fetch(buildApiUrl('/upload/blog-media'), {
     method: 'POST',
     headers: { Authorization: `Bearer ${token}` },
     body: formData,
