@@ -3,6 +3,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import StatCard from '@/components/dashboard/StatCard';
 import PageHeader from '@/components/dashboard/PageHeader';
 import StatusBadge from '@/components/dashboard/StatusBadge';
+import AppointmentCalendar from '@/components/dashboard/AppointmentCalendar';
 import { base44 } from '@/api/entities';
 import { Package, CalendarDays, Sparkles, Clock } from 'lucide-react';
 import { differenceInDays, parseISO } from 'date-fns';
@@ -60,6 +61,10 @@ export default function ManagerDashboard() {
         <StatCard title="Chờ xác nhận" value={stats.pendingAppts} icon={Clock} color="orange" subtitle="Cần xử lý" />
         <StatCard title="Liệu trình đang chạy" value={stats.activePlans} icon={Sparkles} color="green" />
         <StatCard title="Lịch hẹn sắp tới" value={stats.upcomingNext} icon={CalendarDays} color="secondary" />
+      </div>
+
+      <div className="mb-6">
+        <AppointmentCalendar />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

@@ -6,14 +6,32 @@ import { base44 } from '@/api/entities';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Search, Plus, Pencil, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+import { DashboardMobileList, DashboardMobileCard } from '@/components/dashboard/MobileDataCard';
 
-const emptyForm = { customerName: '', customerEmail: '', customerPhoneNumber: '', serviceNames: [], date: '', time: '', status: 'pending', notes: '' };
+const emptyForm = {
+  customerMode: 'existing',
+  customerId: '',
+  customerName: '',
+  customerEmail: '',
+  customerPhoneNumber: '',
+  serviceNames: [],
+  date: '',
+  time: '',
+  status: 'pending',
+  notes: '',
+  activateAccount: false,
+  notifyChannel: 'email',
+  assignTreatment: true,
+  totalSessions: 1,
+};
 
 export default function AdminAppointments({ role = 'admin' }) {
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
+  const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -23,12 +41,14 @@ export default function AdminAppointments({ role = 'admin' }) {
   const [saving, setSaving] = useState(false);
 
   const load = async () => {
-    const [appts, svcs] = await Promise.all([
+    const [appts, svcs, custResult] = await Promise.all([
       base44.entities.Appointment.list('-date', 100),
-      base44.entities.Service.filter({ type: 'service' }),
+      base44.entities.Service.list('-created_date', 100),
+      base44.entities.Customer.filter({ limit: 200 }, '-created_date'),
     ]);
     setAppointments(appts);
-    setServices(svcs);
+    setServices(Array.isArray(svcs) ? svcs : []);
+    setCustomers(Array.isArray(custResult) ? custResult : custResult?.items ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
@@ -40,26 +60,129 @@ export default function AdminAppointments({ role = 'admin' }) {
     return matchSearch && matchStatus;
   });
 
-  const openCreate = () => { setForm(emptyForm); setEditId(null); setDialogOpen(true); };
-  const openEdit = (a) => { setForm({ ...a, serviceNames: a.serviceNames || [] }); setEditId(a.id); setDialogOpen(true); };
+  const openCreate = () => {
+    setSaving(false);
+    setForm(emptyForm);
+    setEditId(null);
+    setDialogOpen(true);
+  };
+
+  const openEdit = (a) => {
+    setSaving(false);
+    setForm({
+      ...emptyForm,
+      ...a,
+      customerMode: a.customerId ? 'existing' : 'guest',
+      customerId: a.customerId || '',
+      serviceNames: Array.isArray(a.serviceNames) ? a.serviceNames : [],
+      activateAccount: false,
+      notifyChannel: 'none',
+      assignTreatment: false,
+    });
+    setEditId(a.id);
+    setDialogOpen(true);
+  };
+
+  const handleDialogChange = (open) => {
+    setDialogOpen(open);
+    if (!open) setSaving(false);
+  };
+
+  const pickCustomer = (customerId) => {
+    const c = customers.find((x) => x.id === customerId);
+    if (!c) return;
+    setForm((prev) => ({
+      ...prev,
+      customerId,
+      customerName: c.full_name || c.fullName || '',
+      customerEmail: c.email || '',
+      customerPhoneNumber: c.phone || c.phoneNumber || '',
+    }));
+  };
 
   const handleSave = async () => {
+    if (!form.customerName?.trim()) {
+      toast.error('Vui lòng nhập tên khách hàng');
+      return;
+    }
+    if (!form.customerPhoneNumber || form.customerPhoneNumber.replace(/\D/g, '').length < 8) {
+      toast.error('Số điện thoại phải có ít nhất 8 số');
+      return;
+    }
+    if (!form.serviceNames?.length) {
+      toast.error('Vui lòng chọn dịch vụ');
+      return;
+    }
+    if (!form.date || !form.time) {
+      toast.error('Vui lòng chọn ngày và giờ');
+      return;
+    }
+    if (!editId && form.customerMode === 'existing' && !form.customerId) {
+      toast.error('Vui lòng chọn khách hàng trong hệ thống');
+      return;
+    }
+    if (!editId && form.customerMode === 'guest' && form.activateAccount && !form.customerEmail?.trim()) {
+      toast.error('Kích hoạt tài khoản cần email trùng khớp với người dùng đã có');
+      return;
+    }
+    if (!editId && form.customerMode === 'guest' && !form.activateAccount) {
+      if (form.notifyChannel === 'email' && !form.customerEmail?.trim()) {
+        toast.error('Cần email để gửi thông báo liệu trình');
+        return;
+      }
+      if (form.notifyChannel === 'zalo' && !form.customerPhoneNumber?.trim()) {
+        toast.error('Cần SĐT để gửi thông báo Zalo OA');
+        return;
+      }
+    }
+
     setSaving(true);
-    const payload = {
-      customerName: form.customerName,
-      customerEmail: form.customerEmail || '',
-      customerPhoneNumber: form.customerPhoneNumber,
-      serviceNames: form.serviceNames || [],
-      date: form.date,
-      time: form.time,
-      status: form.status,
-      notes: form.notes || '',
-    };
-    if (editId) await base44.entities.Appointment.update(editId, payload);
-    else await base44.entities.Appointment.createAdmin(payload);
-    await load();
-    setDialogOpen(false);
-    setSaving(false);
+    try {
+      const payload = {
+        customerName: form.customerName.trim(),
+        customerEmail: form.customerEmail || '',
+        customerPhoneNumber: form.customerPhoneNumber.trim(),
+        serviceNames: form.serviceNames,
+        date: form.date,
+        time: form.time,
+        status: form.status,
+        notes: form.notes || '',
+      };
+
+      if (editId) {
+        await base44.entities.Appointment.update(editId, payload);
+      } else {
+        await base44.entities.Appointment.createAdmin({
+          ...payload,
+          customerMode: form.customerMode,
+          customerId: form.customerMode === 'existing' ? form.customerId : undefined,
+          activateAccount: form.customerMode === 'guest' ? form.activateAccount : false,
+          notifyChannel: form.customerMode === 'guest' && !form.activateAccount
+            ? form.notifyChannel
+            : 'none',
+          assignTreatment: form.assignTreatment,
+          totalSessions: Number(form.totalSessions) || 1,
+        });
+      }
+
+      await load();
+      setDialogOpen(false);
+      toast.success(editId ? 'Đã cập nhật lịch hẹn' : 'Đã thêm lịch hẹn và gán liệu trình');
+    } catch (error) {
+      toast.error(error.message || 'Lưu thất bại');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const toggleService = (serviceName) => {
+    setForm((prev) => {
+      const selected = prev.serviceNames || [];
+      const next = selected.includes(serviceName)
+        ? selected.filter((n) => n !== serviceName)
+        : [...selected, serviceName];
+      return { ...prev, serviceNames: next };
+    });
   };
 
   const handleDelete = async (id) => {
@@ -72,6 +195,8 @@ export default function AdminAppointments({ role = 'admin' }) {
     await base44.entities.Appointment.update(id, { status });
     setAppointments(prev => prev.map(a => a.id === id ? { ...a, status } : a));
   };
+
+  const isGuest = form.customerMode === 'guest';
 
   return (
     <DashboardLayout role={role}>
@@ -100,15 +225,47 @@ export default function AdminAppointments({ role = 'admin' }) {
             </SelectContent>
           </Select>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <DashboardMobileList loading={loading} empty={!loading && filtered.length === 0}>
+          {filtered.map((a) => (
+            <DashboardMobileCard
+              key={a.id}
+              title={a.customerName}
+              subtitle={a.customerPhoneNumber}
+              badges={<StatusBadge status={a.status} />}
+              meta={[
+                { label: 'Dịch vụ', value: a.serviceNames?.join(', ') || '—', full: true },
+                { label: 'Ngày', value: a.date },
+                { label: 'Giờ', value: a.time },
+              ]}
+              actions={(
+                <>
+                  <Select value={a.status} onValueChange={(v) => updateStatus(a.id, v)}>
+                    <SelectTrigger className="h-8 text-xs w-auto min-w-[8rem]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pending">Chờ xác nhận</SelectItem>
+                      <SelectItem value="confirmed">Đã xác nhận</SelectItem>
+                      <SelectItem value="completed">Hoàn thành</SelectItem>
+                      <SelectItem value="cancelled">Đã hủy</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="ghost" size="sm" onClick={() => openEdit(a)}><Pencil size={14} /></Button>
+                  <Button variant="ghost" size="sm" className="text-destructive ml-auto" onClick={() => handleDelete(a.id)}><Trash2 size={14} /></Button>
+                </>
+              )}
+            />
+          ))}
+        </DashboardMobileList>
+        <div className="dashboard-table-wrap hidden md:block">
+          <table className="dashboard-table">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Khách hàng</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Dịch vụ</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Ngày & Giờ</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Trạng thái</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Thao tác</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[24%]">Khách hàng</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[28%]">Dịch vụ</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[18%]">Ngày & Giờ</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[16%]">Trạng thái</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[14%]">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -149,17 +306,154 @@ export default function AdminAppointments({ role = 'admin' }) {
         </div>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle className="font-heading italic text-2xl">{editId ? 'Chỉnh sửa' : 'Thêm lịch hẹn'}</DialogTitle></DialogHeader>
-          <div className="space-y-3">
+      <Dialog open={dialogOpen} onOpenChange={handleDialogChange}>
+        <DialogContent className="max-w-lg max-h-[90vh] !flex !flex-col gap-0 p-0 overflow-hidden">
+          <DialogHeader className="px-6 pt-6 pb-2">
+            <DialogTitle className="font-heading italic text-2xl">{editId ? 'Chỉnh sửa' : 'Thêm lịch hẹn'}</DialogTitle>
+            <DialogDescription className="sr-only">
+              Tạo hoặc cập nhật lịch hẹn và gán liệu trình cho khách hàng
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto px-6 py-2 space-y-3">
+            {!editId && (
+              <div>
+                <label className="text-xs text-muted-foreground">Loại khách hàng</label>
+                <div className="mt-1.5 flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={form.customerMode === 'existing' ? 'default' : 'outline'}
+                    onClick={() => setForm({ ...form, customerMode: 'existing', activateAccount: false })}
+                  >
+                    Khách có sẵn
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant={form.customerMode === 'guest' ? 'default' : 'outline'}
+                    onClick={() => setForm({ ...form, customerMode: 'guest', customerId: '' })}
+                  >
+                    Khách ngắn hạn
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {!editId && form.customerMode === 'existing' && (
+              <div>
+                <label className="text-xs text-muted-foreground">Chọn khách hàng *</label>
+                <Select value={form.customerId || ''} onValueChange={pickCustomer}>
+                  <SelectTrigger><SelectValue placeholder="Chọn từ hệ thống" /></SelectTrigger>
+                  <SelectContent>
+                    {customers.length === 0 ? (
+                      <SelectItem value="_none" disabled>Chưa có khách hàng</SelectItem>
+                    ) : (
+                      customers.map((c) => (
+                        <SelectItem key={c.id} value={c.id}>
+                          {c.full_name || c.fullName} — {c.email || c.phone || '—'}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            {!editId && isGuest && (
+              <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-3">
+                <label className="flex items-center gap-2 text-sm cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.activateAccount}
+                    onChange={(e) => setForm({
+                      ...form,
+                      activateAccount: e.target.checked,
+                      notifyChannel: e.target.checked ? 'none' : 'email',
+                    })}
+                  />
+                  Kích hoạt / liên kết tài khoản (email phải trùng khớp user đã có)
+                </label>
+
+                {!form.activateAccount && (
+                  <div>
+                    <label className="text-xs text-muted-foreground">Thông báo liệu trình</label>
+                    <Select
+                      value={form.notifyChannel}
+                      onValueChange={(v) => setForm({ ...form, notifyChannel: v })}
+                    >
+                      <SelectTrigger className="mt-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="email">Gửi qua Email</SelectItem>
+                        <SelectItem value="zalo">Gửi qua Zalo OA</SelectItem>
+                        <SelectItem value="none">Không gửi</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-[11px] text-muted-foreground mt-1">
+                      Khách ngắn hạn không có tài khoản — thông báo qua email hoặc Zalo.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div><label className="text-xs text-muted-foreground">Tên khách hàng *</label><Input value={form.customerName} onChange={e => setForm({ ...form, customerName: e.target.value })} /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-muted-foreground">Email</label><Input value={form.customerEmail} onChange={e => setForm({ ...form, customerEmail: e.target.value })} /></div>
-              <div><label className="text-xs text-muted-foreground">SĐT</label><Input value={form.customerPhoneNumber} onChange={e => setForm({ ...form, customerPhoneNumber: e.target.value })} /></div>
-              <div><label className="text-xs text-muted-foreground">Ngày *</label><Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} /></div>
-              <div><label className="text-xs text-muted-foreground">Giờ *</label><Input type="time" value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} /></div>
+              <div><label className="text-xs text-muted-foreground">Email{isGuest && (form.activateAccount || form.notifyChannel === 'email') ? ' *' : ''}</label><Input value={form.customerEmail} onChange={e => setForm({ ...form, customerEmail: e.target.value })} /></div>
+              <div><label className="text-xs text-muted-foreground">SĐT *</label><Input value={form.customerPhoneNumber} onChange={e => setForm({ ...form, customerPhoneNumber: e.target.value })} /></div>
+              <div>
+                <label className="text-xs text-muted-foreground">Ngày *</label>
+                <Input type="date" required value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">Giờ *</label>
+                <Input type="time" required value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} />
+              </div>
             </div>
+
+            <div>
+              <label className="text-xs text-muted-foreground">Dịch vụ *</label>
+              <div className="mt-1.5 max-h-36 overflow-y-auto rounded-lg border border-border divide-y divide-border">
+                {services.length === 0 ? (
+                  <p className="px-3 py-2 text-xs text-muted-foreground">Chưa có dịch vụ</p>
+                ) : (
+                  services.map((s) => {
+                    const checked = (form.serviceNames || []).includes(s.name);
+                    return (
+                      <label key={s.id} className="flex items-center gap-2 px-3 py-2 text-sm cursor-pointer hover:bg-muted/40">
+                        <input type="checkbox" checked={checked} onChange={() => toggleService(s.name)} />
+                        <span className="flex-1">{s.name}</span>
+                      </label>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {!editId && (
+              <div className="grid grid-cols-2 gap-3 items-end">
+                <label className="flex items-center gap-2 text-sm col-span-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.assignTreatment}
+                    onChange={(e) => setForm({ ...form, assignTreatment: e.target.checked })}
+                  />
+                  Tự động gán liệu trình cho khách
+                </label>
+                {form.assignTreatment && (
+                  <div>
+                    <label className="text-xs text-muted-foreground">Số buổi</label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={form.totalSessions}
+                      onChange={(e) => setForm({ ...form, totalSessions: e.target.value })}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             <div>
               <label className="text-xs text-muted-foreground">Trạng thái</label>
               <Select value={form.status} onValueChange={v => setForm({ ...form, status: v })}>
@@ -174,9 +468,12 @@ export default function AdminAppointments({ role = 'admin' }) {
             </div>
             <div><label className="text-xs text-muted-foreground">Ghi chú</label><Input value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDialogOpen(false)}>Hủy</Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground">{saving ? 'Đang lưu...' : 'Lưu'}</Button>
+
+          <DialogFooter className="px-6 py-4 border-t border-border bg-background">
+            <Button type="button" variant="outline" onClick={() => handleDialogChange(false)}>Hủy</Button>
+            <Button type="button" onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground">
+              {saving ? 'Đang lưu...' : 'Lưu'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,4 +1,4 @@
-import { apiRequest, setTokens, clearToken } from './client';
+import { apiRequest, setTokens, clearToken, buildApiUrl } from './client';
 
 function buildQuery(params) {
   const search = new URLSearchParams();
@@ -132,6 +132,48 @@ export const auth = {
       refreshToken: result.refreshToken,
     });
     return result.user;
+  },
+
+  async loginWithGoogle(idToken) {
+    const result = await apiRequest('/auth/google', {
+      method: 'POST',
+      body: { idToken },
+    });
+    setTokens({
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+    return result.user;
+  },
+
+  async completeGoogleOAuth(code) {
+    const result = await apiRequest('/auth/google/complete', {
+      method: 'POST',
+      body: { code },
+    });
+    setTokens({
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+    });
+    return result.user;
+  },
+
+  async issueCrossDomainCode() {
+    const result = await apiRequest('/auth/issue-code', { method: 'POST' });
+    return result.code;
+  },
+
+  getGoogleOAuthStartUrl(from) {
+    const params = new URLSearchParams();
+    if (from) params.set('from', from);
+    if (typeof window !== 'undefined') {
+      params.set('origin', window.location.origin);
+    }
+    const query = params.toString();
+    if (typeof window !== 'undefined') {
+      return `${window.location.origin}/api/auth/google${query ? `?${query}` : ''}`;
+    }
+    return buildApiUrl(`/auth/google${query ? `?${query}` : ''}`);
   },
 
   async register(data) {

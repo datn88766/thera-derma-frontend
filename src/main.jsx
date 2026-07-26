@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@/index.css';
+import { isBlogHostname } from '@/lib/blogUrl';
 
-const isBlogHost =
-  window.location.hostname === 'blog.localhost' ||
-  window.location.hostname.startsWith('blog.');
+const isBlogHost = isBlogHostname(window.location.hostname);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 

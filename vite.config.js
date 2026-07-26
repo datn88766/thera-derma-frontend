@@ -48,7 +48,7 @@ export default defineConfig({
     port: 5174,
     strictPort: true,
     host: true,
-    allowedHosts: ['localhost', 'blog.localhost', '.localhost'],
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',

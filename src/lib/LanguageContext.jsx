@@ -4,8 +4,27 @@ import en from '../locales/en.json';
 
 export const translations = { vi, en };
 
+const LANG_KEY = 'theraderma_lang';
+
+function readStoredLang() {
+  try {
+    const stored = localStorage.getItem(LANG_KEY);
+    return stored === 'en' || stored === 'vi' ? stored : 'vi';
+  } catch {
+    return 'vi';
+  }
+}
+
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState('vi');
+  const [lang, setLangState] = useState(readStoredLang);
+  const setLang = (next) => {
+    setLangState(next);
+    try {
+      localStorage.setItem(LANG_KEY, next);
+    } catch {
+      // ignore
+    }
+  };
   const t = translations[lang];
   return (
     <LanguageContext.Provider value={{ lang, setLang, t }}>

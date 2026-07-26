@@ -8,7 +8,7 @@ export default function PhilosophySection({ image }) {
   return (
     <section id="philosophy" className="pt-10 md:pt-14 pb-24 md:pb-32 px-6 md:px-12">
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Left Content */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -19,12 +19,12 @@ export default function PhilosophySection({ image }) {
             <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground font-medium mb-4">
               {t.philosophy.badge}
             </p>
-            <h2 className="font-heading italic font-light text-4xl md:text-6xl tracking-tight text-foreground mb-8">
+            <h2 className="font-heading italic font-light text-[2rem] md:text-6xl tracking-tight text-foreground mb-6 md:mb-8">
               {t.philosophy.title1}
               <br />
               <span className="text-primary">{t.philosophy.title2}</span>
             </h2>
-            <p className="text-lg font-body font-light leading-relaxed text-foreground/70 mb-8 max-w-lg">
+            <p className="text-base md:text-lg font-body font-light leading-relaxed text-foreground/70 mb-6 md:mb-8 max-w-lg">
               {t.philosophy.body1}
             </p>
             <p className="text-base font-body leading-relaxed text-foreground/50 mb-10 max-w-lg">

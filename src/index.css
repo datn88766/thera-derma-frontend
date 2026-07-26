@@ -99,6 +99,40 @@
 
   html {
     scroll-behavior: smooth;
+    font-size: clamp(16px, 15.2px + 0.3vw, 17.5px);
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* iPhone width micro-tiers (polish only). */
+@media (min-width: 360px) and (max-width: 389px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 390px) and (max-width: 392px) {
+  html {
+    font-size: 16.4px;
+  }
+}
+
+@media (min-width: 393px) and (max-width: 429px) {
+  html {
+    font-size: 16.6px;
+  }
+}
+
+@media (min-width: 430px) and (max-width: 439px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 440px) and (max-width: 767px) {
+  html {
+    font-size: 17.5px;
   }
 }
 
@@ -118,6 +152,97 @@
 }
 
 @layer utilities {
+  /* Layout helpers (mobile-first) */
+  .page-x {
+    @apply px-4 ios16Max:px-5 sm:px-6 lg:px-12;
+  }
+
+  .section-y {
+    @apply py-10 sm:py-12 lg:py-16;
+  }
+
+  .section-gap {
+    @apply gap-8 sm:gap-10 lg:gap-14;
+  }
+
+  /* Typography presets (use instead of ad-hoc text-[..] where possible) */
+  .t-hero {
+    @apply font-heading font-extrabold leading-[1.05] tracking-tight;
+    font-size: clamp(2.15rem, 1.4rem + 2.2vw, 3.5rem);
+  }
+
+  .t-h1 {
+    @apply font-heading font-bold leading-[1.12] tracking-tight;
+    font-size: clamp(1.8rem, 1.25rem + 1.4vw, 2.6rem);
+  }
+
+  .t-h2 {
+    @apply font-heading font-bold leading-[1.18] tracking-tight;
+    font-size: clamp(1.5rem, 1.15rem + 0.9vw, 2.1rem);
+  }
+
+  .t-body {
+    @apply font-body leading-relaxed text-foreground/90;
+    font-size: clamp(1rem, 0.98rem + 0.15vw, 1.0625rem);
+  }
+
+  .t-small {
+    @apply font-body leading-snug text-muted-foreground;
+    font-size: 0.9375rem;
+  }
+
+  /* Touch targets (avoid iOS zoom on inputs) */
+  .tap {
+    min-height: 44px;
+  }
+
+  /* System-level overflow guards (mobile-first). */
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  img,
+  video,
+  iframe,
+  svg {
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    height: auto;
+  }
+
+  a,
+  p,
+  li,
+  span {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  pre,
+  code {
+    max-width: 100%;
+  }
+
+  pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Dashboard / admin tables: full-width layout; scroll on wrapper, not on table. */
+  .dashboard-table-wrap {
+    @apply w-full overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-table {
+    @apply w-full table-fixed;
+  }
+
   .luxury-glass {
     background: rgba(248, 246, 242, 0.72);
     backdrop-filter: blur(18px);

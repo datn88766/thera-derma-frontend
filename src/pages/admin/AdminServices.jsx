@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus, Pencil, Trash2, Search } from 'lucide-react';
 import { formatServicePriceRange } from '@/shared/utils/servicePrice';
 import { resolveMediaUrl } from '@/lib/mediaUpload';
+import { DashboardMobileList, DashboardMobileCard } from '@/components/dashboard/MobileDataCard';
 
 export default function AdminServices({ role = 'admin' }) {
   const [services, setServices] = useState([]);
@@ -99,17 +100,45 @@ export default function AdminServices({ role = 'admin' }) {
           </Select>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <DashboardMobileList loading={loading} empty={!loading && filtered.length === 0}>
+          {filtered.map((s) => (
+            <DashboardMobileCard
+              key={s.id}
+              title={s.name}
+              subtitle={s.category || '—'}
+              badges={(
+                <>
+                  <StatusBadge status={s.type} />
+                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${s.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {s.inStock ? 'Khả dụng' : 'Hết hàng'}
+                  </span>
+                </>
+              )}
+              meta={[
+                { label: 'Giá', value: formatServicePriceRange(s.price, s.priceMax) || `${s.price?.toLocaleString('vi-VN')}đ` },
+                { label: 'Thời gian', value: s.type === 'service' && s.duration ? `${s.duration} phút` : '—' },
+              ]}
+              actions={(
+                <>
+                  <Button variant="ghost" size="sm" onClick={() => openEdit(s)}><Pencil size={14} className="mr-1" /> Sửa</Button>
+                  <Button variant="ghost" size="sm" className="text-destructive ml-auto" onClick={() => handleDelete(s.id)}><Trash2 size={14} /></Button>
+                </>
+              )}
+            />
+          ))}
+        </DashboardMobileList>
+
+        <div className="dashboard-table-wrap hidden md:block">
+          <table className="dashboard-table">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Tên</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Loại</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Danh mục</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Giá</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Thời gian</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Tình trạng</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Thao tác</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[24%]">Tên</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[10%]">Loại</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[12%]">Danh mục</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[14%]">Giá</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[12%]">Thời gian</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[14%]">Tình trạng</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[14%]">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">

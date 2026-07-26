@@ -4,8 +4,7 @@ import { Menu, X, LayoutDashboard, ChevronDown, User, LogOut } from 'lucide-reac
 import { useLang } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-
-const BLOG_URL = import.meta.env.VITE_BLOG_URL || 'http://blog.localhost:5174';
+import { getBlogUrl } from '@/lib/blogUrl';
 
 const SECTION_IDS = ['hero', 'services', 'academy', 'philosophy', 'contact'];
 
@@ -51,6 +50,7 @@ export default function Navbar() {
   const isHome = location.pathname === '/';
   const isBlog = location.pathname.startsWith('/blog');
   const labels = LABELS[lang] || LABELS.en;
+  const blogUrl = getBlogUrl();
 
   const dashboardPath =
     user?.role === 'admin'
@@ -67,7 +67,7 @@ export default function Navbar() {
     { key: 'academy', href: '#academy' },
     { key: 'philosophy', href: '#philosophy' },
     { key: 'contact', href: '#contact' },
-    { key: 'blog', href: BLOG_URL, route: true, external: true },
+    { key: 'blog', href: blogUrl, route: true, external: true },
   ];
 
   const updateScroll = useCallback(() => {
@@ -128,7 +128,7 @@ export default function Navbar() {
     const label = labels[link.key];
 
     if (link.route) {
-      const className = `relative font-nav text-[13px] font-medium tracking-[0.02em] transition-colors duration-200 ${
+      const className = `relative font-nav ${mobile ? "text-sm" : "text-[13px]"} font-medium tracking-[0.02em] transition-colors duration-200 ${
         mobile ? 'block px-4 py-3.5 rounded-xl' : 'px-4 py-2 rounded-full'
       } ${active ? 'text-foreground' : 'text-foreground/55 hover:text-foreground'}`;
       if (link.external) {
@@ -168,7 +168,7 @@ export default function Navbar() {
           e.preventDefault();
           scrollTo(link.href);
         }}
-        className={`group relative font-nav text-[13px] font-medium tracking-[0.02em] transition-colors duration-200 ${
+        className={`group relative font-nav ${mobile ? "text-sm" : "text-[13px]"} font-medium tracking-[0.02em] transition-colors duration-200 ${
           mobile ? 'block px-4 py-3.5 rounded-xl' : 'px-4 py-2 rounded-full'
         } ${active ? 'text-foreground' : 'text-foreground/55 hover:text-foreground'}`}
       >
@@ -195,15 +195,15 @@ export default function Navbar() {
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50 px-5 md:px-8 pt-6 pointer-events-none"
+        className="fixed top-0 left-0 right-0 z-50 page-x pt-3 sm:pt-5 md:pt-6 pointer-events-none"
       >
         <motion.div
           animate={{
-            height: scrolled ? 64 : 80,
+            height: scrolled ? 60 : 72,
             backdropFilter: scrolled ? 'blur(28px)' : 'blur(22px)',
           }}
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-          className={`pointer-events-auto mx-auto flex max-w-[1440px] items-center justify-between gap-4 rounded-[24px] px-5 md:px-8 lg:px-10 transition-[background,box-shadow,border-color] duration-300 ${
+          className={`pointer-events-auto mx-auto flex max-w-[1440px] items-center justify-between gap-2 sm:gap-4 rounded-[20px] sm:rounded-[24px] px-4 sm:px-5 md:px-8 lg:px-10 transition-[background,box-shadow,border-color] duration-300 ${
             scrolled ? 'navbar-glass-scrolled' : 'navbar-glass'
           }`}
           style={{ WebkitBackdropFilter: scrolled ? 'blur(28px)' : 'blur(22px)' }}
@@ -216,7 +216,7 @@ export default function Navbar() {
               if (isHome) scrollTo('#hero');
               else navigate('/');
             }}
-            className="flex-shrink-0 font-heading text-[1.65rem] md:text-[1.75rem] italic font-light tracking-[-0.02em] text-foreground leading-none"
+            className="flex-shrink-0 font-heading text-[1.4rem] sm:text-[1.65rem] md:text-[1.75rem] italic font-light tracking-[-0.02em] text-foreground leading-none"
           >
             Thera Derma
           </a>
@@ -345,14 +345,14 @@ export default function Navbar() {
                 e.preventDefault();
                 scrollTo('booking');
               }}
-              className="px-3.5 py-2 text-xs font-nav font-medium text-[var(--sage-dark)] rounded-xl bg-[#C9D8CF]"
+              className="tap inline-flex items-center px-3.5 text-sm font-nav font-medium text-[var(--sage-dark)] rounded-xl bg-[#C9D8CF]"
             >
               {lang === 'vi' ? 'Đặt lịch' : 'Book'}
             </a>
             <button
               type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 rounded-xl text-foreground/70 hover:bg-foreground/5 transition-colors"
+              className="tap p-2 rounded-xl text-foreground/70 hover:bg-foreground/5 transition-colors"
               aria-label="Menu"
             >
               {mobileOpen ? <X size={22} /> : <Menu size={22} />}
@@ -391,6 +391,35 @@ export default function Navbar() {
                 ))}
               </div>
               <div className="p-5 border-t border-foreground/8 space-y-3">
+                {user && (
+                  <div className="px-2 pb-2 border-b border-foreground/8">
+                    <p className="text-sm font-medium text-foreground truncate">{user.full_name}</p>
+                    <p className="text-xs text-foreground/50 truncate">{user.email}</p>
+                  </div>
+                )}
+
+                {user && dashboardPath && (
+                  <Link
+                    to={dashboardPath}
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 w-full px-4 py-3 text-sm font-medium rounded-2xl border border-foreground/12 hover:bg-foreground/5 transition-colors"
+                  >
+                    <LayoutDashboard size={16} />
+                    {labels.dashboard}
+                  </Link>
+                )}
+
+                {user && (
+                  <Link
+                    to="/customer"
+                    onClick={() => setMobileOpen(false)}
+                    className="flex items-center gap-2 w-full px-4 py-3 text-sm font-medium rounded-2xl border border-foreground/12 hover:bg-foreground/5 transition-colors"
+                  >
+                    <User size={16} />
+                    {labels.profile}
+                  </Link>
+                )}
+
                 <div className="flex justify-center gap-1 rounded-full border border-foreground/10 p-1 text-xs font-medium">
                   <button type="button" onClick={() => setLang('en')} className={`flex-1 py-2 rounded-full ${lang === 'en' ? 'bg-foreground/8' : ''}`}>EN</button>
                   <button type="button" onClick={() => setLang('vi')} className={`flex-1 py-2 rounded-full ${lang === 'vi' ? 'bg-foreground/8' : ''}`}>VI</button>

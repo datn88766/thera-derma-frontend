@@ -5,13 +5,24 @@ import { useFooterSettings } from '@/shared/hooks/useServices';
 
 export default function Footer() {
   const { t } = useLang();
-  const { data: settings } = useFooterSettings();
+  const { data: settings, isLoading } = useFooterSettings();
 
-  const phone = settings?.phone || t.footer.phone;
-  const email = settings?.email || t.footer.email;
-  const address = settings?.address || t.footer.address;
-  const hours = settings?.openingHours || t.footer.hours;
-  const rights = settings?.copyrightText || t.footer.rights;
+  const contactFromAdmin = settings != null;
+  const phone = contactFromAdmin
+    ? (settings.phone?.trim() || '—')
+    : (isLoading ? '…' : t.footer.phone);
+  const email = contactFromAdmin
+    ? (settings.email?.trim() || '—')
+    : (isLoading ? '…' : t.footer.email);
+  const address = contactFromAdmin
+    ? (settings.address?.trim() || '—')
+    : (isLoading ? '…' : t.footer.address);
+  const hours = contactFromAdmin
+    ? (settings.openingHours?.trim() || '—')
+    : (isLoading ? '…' : t.footer.hours);
+  const rights = contactFromAdmin
+    ? (settings.copyrightText?.trim() || t.footer.rights)
+    : (isLoading ? '…' : t.footer.rights);
 
   return (
     <footer id="contact" className="bg-foreground text-background/80 py-20 px-6 md:px-12">
@@ -67,18 +78,23 @@ export default function Footer() {
               {t.footer.contact}
             </p>
             <div className="space-y-4">
-              <div className="flex items-start gap-3">
+              <a href={`tel:${phone.replace(/\s/g, '')}`} className="flex items-start gap-3 group">
                 <Phone size={16} className="text-primary mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-background/60">{phone}</p>
-              </div>
-              <div className="flex items-start gap-3">
+                <span className="text-sm text-background/60 group-hover:text-background transition-colors">{phone}</span>
+              </a>
+              <a href={`mailto:${email}`} className="flex items-start gap-3 group">
                 <Mail size={16} className="text-primary mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-background/60">{email}</p>
-              </div>
-              <div className="flex items-start gap-3">
+                <span className="text-sm text-background/60 group-hover:text-background transition-colors">{email}</span>
+              </a>
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-start gap-3 group"
+              >
                 <MapPin size={16} className="text-primary mt-0.5 flex-shrink-0" />
-                <p className="text-sm text-background/60">{address}</p>
-              </div>
+                <span className="text-sm text-background/60 group-hover:text-background transition-colors">{address}</span>
+              </a>
               <div className="flex items-start gap-3">
                 <Clock size={16} className="text-primary mt-0.5 flex-shrink-0" />
                 <p className="text-sm text-background/60">{hours}</p>

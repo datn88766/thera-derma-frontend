@@ -4,7 +4,7 @@ import CoverMediaUpload from '@/components/admin/CoverMediaUpload';
 import RichDescriptionEditor from '@/components/admin/RichDescriptionEditor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
@@ -85,6 +85,9 @@ export default function ServiceEditDialog({ open, onOpenChange, service, onSaved
           <DialogTitle className="font-heading italic text-2xl">
             {editId ? 'Chỉnh sửa' : 'Thêm mới'}
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            {editId ? 'Cập nhật thông tin dịch vụ hoặc sản phẩm' : 'Thêm dịch vụ hoặc sản phẩm mới'}
+          </DialogDescription>
         </DialogHeader>
 
         <div key={editId ?? 'new'} className="space-y-4">

@@ -3,24 +3,23 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Users, CalendarDays, Package, Settings, Newspaper,
-  MessageSquare, LogOut, Menu, X, ChevronRight, Sparkles, ClipboardCheck, Umbrella, Bell
+  MessageSquare, LogOut, Menu, X, ChevronRight, Sparkles, ClipboardCheck, Umbrella, Bell, Mail
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNotificationStore } from '@/shared/stores/notificationStore';
+import { getBlogAdminUrl, getBlogUrl } from '@/lib/blogUrl';
+import { auth } from '@/api/entities';
 
-const BLOG_ADMIN_URL = import.meta.env.VITE_BLOG_URL
-  ? `${import.meta.env.VITE_BLOG_URL}/admin/newsroom`
-  : 'http://blog.localhost:5174/admin/newsroom';
-
-const adminMenu = [
+const buildAdminMenu = () => [
   { label: 'Tổng quan', icon: LayoutDashboard, path: '/admin' },
   { label: 'Người dùng', icon: Users, path: '/admin/users' },
   { label: 'Dịch vụ & Sản phẩm', icon: Package, path: '/admin/services' },
   { label: 'Lịch hẹn', icon: CalendarDays, path: '/admin/appointments' },
   { label: 'Liệu trình', icon: Sparkles, path: '/admin/treatments' },
-  { label: 'Blog', icon: Newspaper, path: BLOG_ADMIN_URL, external: true },
+  { label: 'Blog', icon: Newspaper, path: getBlogAdminUrl(), external: true, sso: true },
   { label: 'Tin nhắn tự động', icon: MessageSquare, path: '/admin/messages' },
+  { label: 'Thông báo Email', icon: Mail, path: '/admin/email' },
   { label: 'Chấm công NV', icon: ClipboardCheck, path: '/admin/attendance' },
   { label: 'Nghỉ phép', icon: Umbrella, path: '/admin/leave' },
   { label: 'Cài đặt Footer', icon: Settings, path: '/admin/settings' },
@@ -41,9 +40,23 @@ export default function DashboardLayout({ children, role }) {
   const { logout } = useAuth();
   const items = useNotificationStore((s) => s.items);
   const markRead = useNotificationStore((s) => s.markRead);
-  const menu = role === 'admin' ? adminMenu : staffMenu;
+  const menu = role === 'admin' ? buildAdminMenu() : staffMenu;
   const panelLabel = role === 'admin' ? 'Admin Panel' : 'Staff Panel';
   const unread = items.filter((n) => !n.isRead).length;
+
+  const currentPageLabel = menu.find((item) => !item.external && location.pathname === item.path)?.label ?? '';
+
+  const handleBlogOpen = async () => {
+    try {
+      const code = await auth.issueCrossDomainCode();
+      const callbackUrl = new URL('/auth/callback', getBlogUrl());
+      callbackUrl.searchParams.set('code', code);
+      callbackUrl.searchParams.set('next', '/admin/newsroom');
+      window.open(callbackUrl.toString(), '_blank', 'noopener,noreferrer');
+    } catch {
+      window.open(getBlogAdminUrl(), '_blank', 'noopener,noreferrer');
+    }
+  };
 
   const handleLogout = () => {
     logout('/');
@@ -59,7 +72,8 @@ export default function DashboardLayout({ children, role }) {
       )}
 
       <aside className={cn(
-        "fixed top-0 left-0 h-full w-64 bg-foreground text-background z-40 flex flex-col transition-transform duration-300",
+        // Giảm sidebar để fit viewport ~1152px (MacBook 12), vẫn nới ở màn lớn hơn
+        "fixed top-0 left-0 h-full w-[220px] iosMax:w-[240px] xl:w-64 bg-foreground text-background z-40 flex flex-col transition-transform duration-300",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 border-b border-background/10">
@@ -79,6 +93,14 @@ export default function DashboardLayout({ children, role }) {
                 : "text-background/60 hover:text-background hover:bg-background/10"
             );
             if (item.external) {
+              if (item.sso) {
+                return (
+                  <button key={item.path} type="button" onClick={handleBlogOpen} className={className}>
+                    <item.icon size={18} />
+                    {item.label}
+                  </button>
+                );
+              }
               return (
                 <a key={item.path} href={item.path} target="_blank" rel="noreferrer" className={className}>
                   <item.icon size={18} />
@@ -113,14 +135,17 @@ export default function DashboardLayout({ children, role }) {
         </div>
       </aside>
 
-      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border px-4 py-3 flex items-center gap-4">
+      <div className="flex-1 w-full min-w-0 lg:ml-[220px] iosMax:ml-[240px] xl:ml-64 flex flex-col min-h-screen">
+        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border px-4 iosMini:px-3 iosStd:px-3 iosPro:px-3 lg:px-6 py-3 flex items-center gap-4">
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-muted"
             onClick={() => setSidebarOpen(true)}
           >
             <Menu size={20} />
           </button>
+          {currentPageLabel && (
+            <span className="lg:hidden text-sm font-medium text-foreground/80 truncate">{currentPageLabel}</span>
+          )}
           <div className="flex-1" />
           <div className="relative group">
             <button className="relative p-2 rounded-lg hover:bg-muted" type="button">
@@ -154,8 +179,8 @@ export default function DashboardLayout({ children, role }) {
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-8">
-          {children}
+        <main className="flex-1 w-full min-w-0 p-4 iosMini:p-3 iosStd:p-3 iosPro:p-3 md:p-6 mb12:p-7 xl:p-8">
+          <div className="w-full max-w-none">{children}</div>
         </main>
       </div>
     </div>

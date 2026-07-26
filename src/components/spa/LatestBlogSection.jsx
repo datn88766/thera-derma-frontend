@@ -3,8 +3,7 @@ import { motion } from 'framer-motion';
 import { ChevronRight, Calendar, Eye } from 'lucide-react';
 import { base44 } from '@/api/entities';
 import { format } from 'date-fns';
-
-const BLOG_URL = import.meta.env.VITE_BLOG_URL || 'http://blog.localhost:5174';
+import { getBlogUrl } from '@/lib/blogUrl';
 
 const FALLBACK_IMAGES = [
   'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=600&q=80',
@@ -14,6 +13,7 @@ const FALLBACK_IMAGES = [
 
 export default function LatestBlogSection() {
   const [posts, setPosts] = useState([]);
+  const blogUrl = getBlogUrl();
 
   useEffect(() => {
     base44.entities.BlogPost.list('-created_date', 3).then(data => {
@@ -25,25 +25,25 @@ export default function LatestBlogSection() {
   if (posts.length === 0) return null;
 
   return (
-    <section className="py-20 md:py-24 px-6 md:px-12 bg-background">
+    <section className="py-12 md:py-24 px-6 md:px-12 bg-background">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 0.7 }}
-          className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12"
+          className="flex flex-col md:flex-row md:items-end justify-between gap-3 md:gap-4 mb-8 md:mb-12"
         >
           <div>
             <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground font-medium mb-3">
               Kiến thức & Tin tức
             </p>
-            <h2 className="font-heading italic font-light text-4xl md:text-5xl tracking-tight text-foreground">
+            <h2 className="font-heading italic font-light text-[2rem] md:text-5xl tracking-tight text-foreground">
               Bài viết <span className="text-primary">mới nhất</span>
             </h2>
           </div>
           <a
-            href={BLOG_URL}
+            href={blogUrl}
             className="flex items-center gap-1.5 text-sm font-medium tracking-widest uppercase text-muted-foreground hover:text-foreground transition-colors duration-300"
           >
             Xem tất cả <ChevronRight size={15} />
@@ -65,7 +65,7 @@ export default function LatestBlogSection() {
                 transition={{ duration: 0.5, delay: i * 0.12 }}
                 className="group"
               >
-                <a href={`${BLOG_URL}/${post.slug || post.id}`}>
+                <a href={`${blogUrl}/${post.slug || post.id}`}>
                   <div className="relative aspect-[4/3] overflow-hidden rounded-xl mb-4">
                     <img
                       src={img}

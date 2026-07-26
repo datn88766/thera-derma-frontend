@@ -18,7 +18,7 @@ export default function HeroSection({ heroImage }) {
   ];
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center overflow-hidden">
+    <section id="hero" className="relative min-h-[85vh] sm:min-h-[90vh] md:min-h-screen flex items-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0">
         <motion.img
@@ -34,13 +34,13 @@ export default function HeroSection({ heroImage }) {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full pt-32 pb-20">
+      <div className="relative z-10 max-w-7xl mx-auto page-x w-full pt-[5.5rem] sm:pt-28 md:pt-32 pb-10 sm:pb-16 md:pb-20">
         <div className="max-w-2xl">
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
-            className="text-sm tracking-[0.3em] uppercase text-muted-foreground font-medium mb-6"
+            className="text-xs sm:text-sm tracking-[0.26em] uppercase text-muted-foreground font-medium mb-5 sm:mb-6"
           >
             {t.hero.topBadge}
           </motion.p>
@@ -49,7 +49,7 @@ export default function HeroSection({ heroImage }) {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 1 }}
-            className="font-heading italic font-light text-5xl md:text-7xl lg:text-8xl leading-[0.9] tracking-tight text-foreground mb-8"
+            className="font-heading italic font-light tracking-tight text-foreground mb-5 sm:mb-8 leading-[1.05] sm:leading-[1] text-[clamp(2.75rem,9vw,5rem)] md:text-7xl lg:text-8xl"
           >
             {t.hero.title1}
             <br />
@@ -62,7 +62,7 @@ export default function HeroSection({ heroImage }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.8, duration: 0.8 }}
-            className="text-lg md:text-xl font-body font-light leading-relaxed text-foreground/70 mb-10 max-w-lg"
+            className="font-body font-light leading-relaxed text-foreground/70 mb-6 sm:mb-10 max-w-lg text-base sm:text-lg md:text-xl"
           >
             {t.hero.subtitle}
           </motion.p>
@@ -72,7 +72,7 @@ export default function HeroSection({ heroImage }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.8 }}
-            className="flex flex-wrap gap-6 mb-12"
+            className="flex flex-wrap gap-4 sm:gap-6 mb-7 sm:mb-12"
           >
             {stats.map((stat) => (
               <div key={stat.label} className="flex items-center gap-3">
@@ -97,7 +97,7 @@ export default function HeroSection({ heroImage }) {
             <a
               href="#booking"
               onClick={(e) => { e.preventDefault(); document.querySelector('#booking')?.scrollIntoView({ behavior: 'smooth' }); }}
-              className="group inline-flex items-center gap-3 px-8 py-4 bg-foreground text-background text-sm font-semibold tracking-widest uppercase hover:bg-primary transition-all duration-500"
+              className="tap group inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-8 py-3 sm:py-4 bg-foreground text-background text-sm font-semibold tracking-widest uppercase hover:bg-primary transition-all duration-500 rounded-2xl"
             >
               {t.hero.cta1}
               <ArrowDown size={16} className="group-hover:translate-y-1 transition-transform" />
@@ -105,7 +105,7 @@ export default function HeroSection({ heroImage }) {
             <a
               href="#services"
               onClick={(e) => { e.preventDefault(); scrollToServices(); }}
-              className="inline-flex items-center gap-3 px-8 py-4 border border-foreground/20 text-sm font-medium tracking-widest uppercase text-foreground hover:border-foreground/50 transition-all duration-500"
+              className="tap inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-8 py-3 sm:py-4 border border-foreground/20 text-sm font-medium tracking-widest uppercase text-foreground hover:border-foreground/50 transition-all duration-500 rounded-2xl"
             >
               {t.hero.cta2}
             </a>

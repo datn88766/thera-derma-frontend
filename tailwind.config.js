@@ -4,6 +4,36 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}", "../blog-frontend/src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+      screens: {
+        // =========================
+        // Phone (iPhone) breakpoints
+        // Mục tiêu: chia rõ ràng theo dải viewport width (CSS px)
+        // =========================
+        iosMini: { raw: "(min-width: 360px) and (max-width: 389px)" },  // 360×780 (iPhone Mini)
+        iosStd:  { raw: "(min-width: 390px) and (max-width: 392px)" },  // 390×844 (iPhone 12–14 tiêu chuẩn)
+        iosPro:  { raw: "(min-width: 393px) and (max-width: 429px)" },  // 393×852 (iPhone 14 Pro–16)
+        iosMax:  { raw: "(min-width: 430px) and (max-width: 439px)" },  // 430×932 (iPhone Plus/Pro Max)
+        ios16Max:{ raw: "(min-width: 440px) and (max-width: 767px)" },  // 440×956 (iPhone 16 Pro Max & màn lớn mới)
+
+        // =========================
+        // Tablet-only (tách bạch khỏi desktop)
+        // =========================
+        tabletOnly: { raw: "(min-width: 768px) and (max-width: 1023px)" },
+
+        // Viewport thực tế phổ biến trên MacBook 12" Retina (Retina scaling)
+        mb12: "1152px",
+        // Desktop phổ biến & màn lớn để tinh chỉnh spacing/typography khi cần
+        desktop: "1440px",
+        wide: "1920px",
+      },
+      container: {
+        center: true,
+        padding: {
+          DEFAULT: "1rem",
+          sm: "1.5rem",
+          lg: "24px",
+        },
+      },
       fontFamily: {
         heading: ['var(--font-heading)'],
         display: ['var(--font-display)'],

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import { Calendar as CalendarIcon, ArrowRight, Check } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLang } from '@/lib/LanguageContext';
 import { base44 } from '@/api/entities';
+import { useServices } from '@/shared/hooks/useServices';
 
 const timeSlots = [
   '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM',
@@ -27,13 +28,28 @@ function to24h(slot) {
 
 export default function BookingPanel({ bgImage }) {
   const { t } = useLang();
+  const { data: services, isLoading: servicesLoading } = useServices(200);
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', treatment: '', date: null, time: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', serviceId: '', date: null, time: '' });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const bookableServices = useMemo(() => {
+    if (!services?.length) return [];
+    return [...services]
+      .filter((s) => s.isActive !== false)
+      .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  }, [services]);
+
+  const selectedService = bookableServices.find((s) => s.id === form.serviceId);
+
   const handleSubmit = async () => {
-    if (!form.name || !form.phone || !form.treatment || !form.date || !form.time) {
+    if (!form.name || !form.phone || !form.serviceId || !form.date || !form.time) {
+      toast.error(t.booking.errorRequired);
+      return;
+    }
+    const serviceName = selectedService?.name;
+    if (!serviceName) {
       toast.error(t.booking.errorRequired);
       return;
     }
@@ -43,7 +59,7 @@ export default function BookingPanel({ bgImage }) {
         customerName: form.name,
         ...(form.email ? { customerEmail: form.email } : {}),
         customerPhoneNumber: form.phone,
-        serviceNames: [form.treatment],
+        serviceNames: [serviceName],
         date: format(form.date, 'yyyy-MM-dd'),
         time: to24h(form.time),
       });
@@ -95,7 +111,7 @@ export default function BookingPanel({ bgImage }) {
               {t.booking.thankYou} {form.name}
             </h3>
             <p className="text-base text-foreground/60 max-w-md mx-auto">
-              {t.booking.confirmMsg.replace('{treatment}', form.treatment).replace('{date}', format(form.date, 'dd/MM/yyyy')).replace('{time}', form.time)}
+              {t.booking.confirmMsg.replace('{treatment}', selectedService?.name || '').replace('{date}', format(form.date, 'dd/MM/yyyy')).replace('{time}', form.time)}
             </p>
           </motion.div>
         ) : (
@@ -171,20 +187,24 @@ export default function BookingPanel({ bgImage }) {
                   <label className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-medium mb-2 block">
                     {t.booking.treatment} *
                   </label>
-                  <Select value={form.treatment} onValueChange={(v) => setForm({ ...form, treatment: v })}>
+                  <Select
+                    value={form.serviceId}
+                    onValueChange={(v) => setForm({ ...form, serviceId: v })}
+                    disabled={servicesLoading || bookableServices.length === 0}
+                  >
                     <SelectTrigger className="h-12 bg-background border-border/60 font-body">
                       <SelectValue placeholder={t.booking.treatmentPlaceholder} />
                     </SelectTrigger>
                     <SelectContent>
-                      {t.booking.treatments.map((tr) => (
-                        <SelectItem key={tr} value={tr}>{tr}</SelectItem>
+                      {bookableServices.map((svc) => (
+                        <SelectItem key={svc.id} value={svc.id}>{svc.name}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <Button
                   onClick={() => {
-                    if (!form.name || !form.phone || !form.treatment) {
+                    if (!form.name || !form.phone || !form.serviceId) {
                       toast.error(t.booking.errorRequired);
                       return;
                     }

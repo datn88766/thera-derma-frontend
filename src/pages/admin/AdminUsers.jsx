@@ -20,6 +20,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Eye, Sparkles, CalendarDays, Plus, Pencil, Trash2, Shield } from 'lucide-react';
 import { toast } from 'sonner';
+import { DashboardMobileList, DashboardMobileCard } from '@/components/dashboard/MobileDataCard';
 
 const ROLE_PERMISSIONS = {
   admin: 'Toàn quyền: người dùng, khách hàng, dịch vụ, sản phẩm, blog, footer, cài đặt, xóa dữ liệu.',
@@ -203,16 +204,45 @@ export default function AdminUsers() {
             />
           </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <DashboardMobileList
+          loading={loading}
+          empty={filtered.length === 0}
+          emptyMessage="Không có người dùng nào"
+        >
+          {filtered.map((user) => (
+            <DashboardMobileCard
+              key={user.id}
+              title={user.full_name || '—'}
+              subtitle={user.email}
+              badges={(
+                <>
+                  <StatusBadge status={user.role || 'customer'} />
+                  <StatusBadge status={user.status === 'active' ? 'account_active' : (user.status || 'account_active')} />
+                </>
+              )}
+              meta={[
+                { label: 'SĐT', value: user.phoneNumber || '—' },
+              ]}
+              actions={(
+                <>
+                  <Button variant="ghost" size="sm" onClick={() => viewUserDetail(user)}><Eye size={14} className="mr-1" /> Chi tiết</Button>
+                  <Button variant="ghost" size="sm" onClick={() => openEdit(user)}><Pencil size={14} className="mr-1" /> Sửa</Button>
+                  <Button variant="ghost" size="sm" className="text-destructive ml-auto" onClick={() => setDeleteTarget(user)}><Trash2 size={14} /></Button>
+                </>
+              )}
+            />
+          ))}
+        </DashboardMobileList>
+        <div className="dashboard-table-wrap hidden md:block">
+          <table className="dashboard-table">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Tên</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Email</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">SĐT</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Vai trò</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Trạng thái</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase">Thao tác</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[22%]">Tên</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[26%]">Email</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[14%]">SĐT</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[14%]">Vai trò</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[12%]">Trạng thái</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase w-[12%]">Thao tác</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -400,7 +430,7 @@ export default function AdminUsers() {
             </div>
           ) : (
             <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <div>
                   <p className="text-muted-foreground">Email</p>
                   <p className="font-medium">{selectedUser?.email}</p>

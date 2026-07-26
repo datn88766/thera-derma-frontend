@@ -12,11 +12,10 @@ export function useServices(limit = 50) {
 export function useFooterSettings() {
   return useQuery({
     queryKey: ['footer-settings'],
-    queryFn: async () => {
-      const items = await base44.entities.FooterSettings.list();
-      return items[0] ?? null;
-    },
-    staleTime: 120_000,
+    queryFn: async () => base44.entities.FooterSettings.list().then((items) => items[0] ?? null),
+    staleTime: 60_000,
+    refetchOnMount: 'always',
+    retry: 2,
   });
 }
 

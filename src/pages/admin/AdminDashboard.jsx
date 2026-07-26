@@ -3,6 +3,7 @@ import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import StatCard from '@/components/dashboard/StatCard';
 import PageHeader from '@/components/dashboard/PageHeader';
 import StatusBadge from '@/components/dashboard/StatusBadge';
+import AppointmentCalendar from '@/components/dashboard/AppointmentCalendar';
 import { base44 } from '@/api/entities';
 import { useAdminDashboardStats } from '@/shared/hooks/useServices';
 import { useQuery } from '@tanstack/react-query';
@@ -47,18 +48,22 @@ export default function AdminDashboard() {
         </div>
       )}
 
+      <div className="mb-8">
+        <AppointmentCalendar />
+      </div>
+
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-border">
           <h2 className="font-heading italic text-xl">Lịch hẹn gần đây</h2>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
+        <div className="dashboard-table-wrap">
+          <table className="dashboard-table">
             <thead className="bg-muted/50">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Khách hàng</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Dịch vụ</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ngày & Giờ</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Trạng thái</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[28%]">Khách hàng</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[32%]">Dịch vụ</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[22%]">Ngày & Giờ</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider w-[18%]">Trạng thái</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">

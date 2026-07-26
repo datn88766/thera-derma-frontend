@@ -7,19 +7,19 @@ export default function TestimonialsSection() {
   const { t } = useLang();
 
   return (
-    <section className="py-24 md:py-32 px-6 md:px-12">
+    <section className="py-12 md:py-32 px-6 md:px-12">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.8 }}
-          className="mb-20"
+          className="mb-8 md:mb-20"
         >
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground font-medium mb-4">
             {t.testimonials.tagline}
           </p>
-          <h2 className="font-heading italic font-light text-4xl md:text-6xl tracking-tight text-foreground">
+          <h2 className="font-heading italic font-light text-[2rem] md:text-6xl tracking-tight text-foreground">
             {t.testimonials.title1} <span className="text-primary">{t.testimonials.title2}</span>
           </h2>
         </motion.div>
@@ -32,7 +32,7 @@ export default function TestimonialsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-50px' }}
               transition={{ duration: 0.6, delay: idx * 0.15 }}
-              className="group p-8 md:p-10 border border-border/60 hover:border-primary/30 bg-card/50 hover:bg-muted/30 transition-all duration-500"
+              className="group p-5 md:p-10 border border-border/60 hover:border-primary/30 bg-card/50 hover:bg-muted/30 transition-all duration-500"
             >
               <Quote size={24} className="text-primary/30 mb-6" />
               <p className="text-base font-body leading-relaxed text-foreground/70 mb-8">

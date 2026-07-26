@@ -10,7 +10,7 @@ export default function ClinicalSection({ productImage, interiorImage }) {
   const features = t.clinical.features;
 
   return (
-    <section id="academy" className="py-24 md:py-32 px-6 md:px-12 bg-muted/30">
+    <section id="academy" className="py-12 md:py-32 px-6 md:px-12 bg-muted/30">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div
@@ -18,12 +18,12 @@ export default function ClinicalSection({ productImage, interiorImage }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.8 }}
-          className="mb-20"
+          className="mb-10 md:mb-20"
         >
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground font-medium mb-4">
             {t.clinical.tagline}
           </p>
-          <h2 className="font-heading italic font-light text-4xl md:text-6xl lg:text-7xl tracking-tight text-foreground">
+          <h2 className="font-heading italic font-light text-[2rem] md:text-6xl lg:text-7xl tracking-tight text-foreground">
             {t.clinical.title1}
             <br />
             <span className="text-primary">{t.clinical.title2}</span>
@@ -31,7 +31,7 @@ export default function ClinicalSection({ productImage, interiorImage }) {
         </motion.div>
 
         {/* Split Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
           {/* Left - Sticky Image */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -55,7 +55,7 @@ export default function ClinicalSection({ productImage, interiorImage }) {
           </motion.div>
 
           {/* Right - Features */}
-          <div className="space-y-12">
+          <div className="space-y-8 md:space-y-12">
             {features.map((feature, idx) => (
               <motion.div
                 key={idx}

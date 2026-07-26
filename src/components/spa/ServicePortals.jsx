@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, lazy, Suspense } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useServices } from '@/shared/hooks/useServices';
 import { FEATURED_SERVICE_NAMES, formatServicePriceRange } from '@/shared/utils/servicePrice';
@@ -9,8 +9,9 @@ import { useLang } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import BookingModal from '@/components/spa/BookingModal';
-import ServiceEditDialog from '@/components/admin/ServiceEditDialog';
 import { toast } from 'sonner';
+
+const ServiceEditDialog = lazy(() => import('@/components/admin/ServiceEditDialog'));
 
 const GOLD_IMAGE = 'https://media.base44.com/images/public/69e98326eaa5ac077903e89c/fca79c947_pnht.png';
 
@@ -250,15 +251,17 @@ export default function ServicePortals({ images }) {
         servicePrice={bookingService?.price || ''}
       />
     ) : (
-      <ServiceEditDialog
-        key={editingService?.id ?? 'idle'}
-        open={editOpen}
-        onOpenChange={handleEditOpenChange}
-        service={editingService}
-        onSaved={() => queryClient.invalidateQueries({ queryKey: ['services'] })}
-      />
+      <Suspense fallback={null}>
+        <ServiceEditDialog
+          key={editingService?.id ?? 'idle'}
+          open={editOpen}
+          onOpenChange={handleEditOpenChange}
+          service={editingService}
+          onSaved={() => queryClient.invalidateQueries({ queryKey: ['services'] })}
+        />
+      </Suspense>
     )}
-    <section id="services" className="pt-24 md:pt-32 pb-12 md:pb-16 px-6 md:px-12">
+    <section id="services" className="pt-12 md:pt-32 pb-10 md:pb-16 px-6 md:px-12">
       <div className="max-w-7xl mx-auto">
 
         {/* Section Header */}
@@ -267,13 +270,13 @@ export default function ServicePortals({ images }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.8 }}
-          className="mb-20"
+          className="mb-10 md:mb-20"
         >
           <p className="text-sm tracking-[0.3em] uppercase text-muted-foreground font-medium mb-4">
             {t.services.badge}
           </p>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 className="font-heading italic font-light text-4xl md:text-6xl lg:text-7xl tracking-tight text-foreground">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6">
+            <h2 className="font-heading italic font-light text-[2rem] md:text-6xl lg:text-7xl tracking-tight text-foreground">
               Facial
               <br />
               <span className="text-primary">Alchemy</span>
@@ -288,7 +291,7 @@ export default function ServicePortals({ images }) {
         </motion.div>
 
         {/* 3 Featured Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10 md:mb-16">
           {displayFeatured.map((treatment, idx) => (
             <motion.div
               key={treatment.name}

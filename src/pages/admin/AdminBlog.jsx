@@ -134,14 +134,15 @@ export default function AdminBlog() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 text-muted-foreground">Chưa có bài viết nào</div>
         ) : (
-          <table className="w-full text-sm">
+          <div className="dashboard-table-wrap">
+          <table className="dashboard-table text-sm">
             <thead>
               <tr className="border-b border-border text-left text-xs text-muted-foreground uppercase tracking-wide">
-                <th className="px-4 py-3">Bài viết</th>
-                <th className="px-4 py-3 hidden md:table-cell">Danh mục</th>
-                <th className="px-4 py-3 hidden md:table-cell">Lượt xem</th>
-                <th className="px-4 py-3">Trạng thái</th>
-                <th className="px-4 py-3 text-right">Thao tác</th>
+                <th className="px-4 py-3 w-[40%]">Bài viết</th>
+                <th className="px-4 py-3 hidden md:table-cell w-[18%]">Danh mục</th>
+                <th className="px-4 py-3 hidden md:table-cell w-[12%]">Lượt xem</th>
+                <th className="px-4 py-3 w-[15%]">Trạng thái</th>
+                <th className="px-4 py-3 text-right w-[15%]">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -177,6 +178,7 @@ export default function AdminBlog() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
 

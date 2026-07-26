@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import PageHeader from '@/components/dashboard/PageHeader';
 import { base44 } from '@/api/entities';
+import { queryClientInstance } from '@/lib/query-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Save } from 'lucide-react';
@@ -37,6 +38,7 @@ export default function AdminSettings() {
     setSaving(true);
     if (recordId) await base44.entities.FooterSettings.update(recordId, form);
     else { const r = await base44.entities.FooterSettings.create(form); setRecordId(r.id); }
+    await queryClientInstance.invalidateQueries({ queryKey: ['footer-settings'] });
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -52,8 +54,9 @@ export default function AdminSettings() {
     <DashboardLayout role="admin">
       <PageHeader title="Cài đặt Footer" subtitle="Quản lý thông tin liên hệ và mạng xã hội hiển thị trên trang web" />
 
-      <div className="max-w-2xl">
+      <div className="w-full">
         <div className="bg-card border border-border rounded-xl p-6 space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
             <h3 className="font-semibold mb-4 text-foreground">Thông tin liên hệ</h3>
             <div className="space-y-3">
@@ -64,7 +67,7 @@ export default function AdminSettings() {
             </div>
           </div>
 
-          <div className="border-t border-border pt-6">
+          <div>
             <h3 className="font-semibold mb-4 text-foreground">Mạng xã hội</h3>
             <div className="space-y-3">
               <div><label className="text-xs text-muted-foreground block mb-1">Facebook URL</label><Input value={form.facebookUrl} onChange={e => setForm({ ...form, facebookUrl: e.target.value })} placeholder="https://facebook.com/..." /></div>
@@ -72,13 +75,14 @@ export default function AdminSettings() {
               <div><label className="text-xs text-muted-foreground block mb-1">TikTok URL</label><Input value={form.tiktokUrl} onChange={e => setForm({ ...form, tiktokUrl: e.target.value })} placeholder="https://tiktok.com/..." /></div>
             </div>
           </div>
+          </div>
 
           <div className="border-t border-border pt-6">
             <h3 className="font-semibold mb-4 text-foreground">Bản quyền</h3>
             <div><label className="text-xs text-muted-foreground block mb-1">Nội dung bản quyền</label><Input value={form.copyrightText} onChange={e => setForm({ ...form, copyrightText: e.target.value })} placeholder="© 2026 Thera Derma. All rights reserved." /></div>
           </div>
 
-          <Button onClick={handleSave} disabled={saving} className="w-full bg-primary text-primary-foreground">
+          <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto min-w-[200px] bg-primary text-primary-foreground">
             <Save size={16} className="mr-2" />
             {saving ? 'Đang lưu...' : saved ? 'Đã lưu ✓' : 'Lưu thay đổi'}
           </Button>
