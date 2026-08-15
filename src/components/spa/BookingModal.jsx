@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, Check, ArrowRight } from 'lucide-react';
+import { Calendar as CalendarIcon, Check, ArrowRight, ImagePlus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { base44 } from '@/api/entities';
 import { useAuth } from '@/lib/AuthContext';
+import { uploadAppointmentPhoto } from '@/lib/mediaUpload';
 
 const timeSlots = [
   '10:00', '11:00', '12:00', '13:00',
@@ -17,9 +19,15 @@ const timeSlots = [
 
 export default function BookingModal({ open, onClose, serviceName, servicePrice }) {
   const { user, isAuthenticated } = useAuth();
-  const [form, setForm] = useState({ name: '', email: '', phone: '', date: null, time: '' });
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '', date: null, time: '', skinCondition: '',
+  });
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Pre-fill from user account if logged in
   useEffect(() => {
@@ -31,9 +39,25 @@ export default function BookingModal({ open, onClose, serviceName, servicePrice 
         phone: user?.phone || '',
         date: null,
         time: '',
+        skinCondition: '',
       });
+      setPhotoFile(null);
+      setPhotoPreview('');
     }
   }, [open, user]);
+
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const removePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = async () => {
     if (!form.name || !form.phone || !form.date || !form.time) {
@@ -42,6 +66,12 @@ export default function BookingModal({ open, onClose, serviceName, servicePrice 
     }
     setLoading(true);
     try {
+      let photoUrl = '';
+      if (photoFile) {
+        setPhotoUploading(true);
+        photoUrl = await uploadAppointmentPhoto(photoFile);
+        setPhotoUploading(false);
+      }
       await base44.entities.Appointment.create({
         customerName: form.name,
         ...(form.email ? { customerEmail: form.email } : {}),
@@ -49,12 +79,15 @@ export default function BookingModal({ open, onClose, serviceName, servicePrice 
         serviceNames: [serviceName],
         date: format(form.date, 'yyyy-MM-dd'),
         time: form.time,
+        ...(form.skinCondition ? { skinCondition: form.skinCondition } : {}),
+        ...(photoUrl ? { photoUrl } : {}),
       });
       setSubmitted(true);
       toast.success('Đặt lịch thành công!');
     } catch (error) {
       toast.error(error.message || 'Đặt lịch thất bại, vui lòng thử lại');
     } finally {
+      setPhotoUploading(false);
       setLoading(false);
     }
   };
@@ -184,12 +217,61 @@ export default function BookingModal({ open, onClose, serviceName, servicePrice 
                 </div>
               </div>
 
+              {/* Skin condition */}
+              <div>
+                <label className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-medium mb-1.5 block">
+                  Mô tả tình trạng da
+                </label>
+                <Textarea
+                  value={form.skinCondition}
+                  onChange={(e) => setForm({ ...form, skinCondition: e.target.value })}
+                  placeholder="Mô tả tình trạng da của bạn (không bắt buộc)"
+                  className="min-h-20 bg-background border-border/60"
+                />
+              </div>
+
+              {/* Photo upload */}
+              <div>
+                <label className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-medium mb-1.5 block">
+                  Ảnh tình trạng da
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoSelect}
+                  className="hidden"
+                />
+                {photoPreview ? (
+                  <div className="relative w-24 h-24">
+                    <img src={photoPreview} alt="" className="w-full h-full object-cover rounded-md border border-border/60" />
+                    <button
+                      type="button"
+                      onClick={removePhoto}
+                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-foreground text-background flex items-center justify-center"
+                      aria-label="Xóa ảnh"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="flex items-center gap-2 h-11 px-4 border border-dashed border-border/60 text-sm text-muted-foreground hover:border-foreground/30 transition-colors duration-200"
+                  >
+                    <ImagePlus size={16} />
+                    Không bắt buộc — JPG, PNG, tối đa 10MB
+                  </button>
+                )}
+              </div>
+
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
                 className="w-full h-11 bg-foreground text-background hover:bg-primary font-medium tracking-widest uppercase text-xs transition-all duration-500 mt-2"
               >
-                {loading ? 'Đang xử lý...' : 'Xác nhận đặt lịch'}
+                {loading ? (photoUploading ? 'Đang tải ảnh...' : 'Đang xử lý...') : 'Xác nhận đặt lịch'}
                 {!loading && <ArrowRight size={14} className="ml-2" />}
               </Button>
             </div>

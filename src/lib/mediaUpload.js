@@ -36,6 +36,18 @@ export async function uploadCatalogImage(file) {
   return parseUploadResponse(payload, response);
 }
 
+export async function uploadAppointmentPhoto(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(buildApiUrl('/upload/appointment-photo'), {
+    method: 'POST',
+    body: formData,
+  });
+  const payload = await response.json().catch(() => ({}));
+  return parseUploadResponse(payload, response);
+}
+
 export async function uploadCatalogMedia(file) {
   const token = getToken();
   if (!token) throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');

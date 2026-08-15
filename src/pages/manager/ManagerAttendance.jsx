@@ -206,17 +206,19 @@ export default function ManagerAttendance() {
     try {
       if (action === 'in') {
         const checkInTime = format(new Date(), 'HH:mm:ss');
-        const status = checkInTime > '09:00:00' ? 'late' : 'present';
         const rec = await base44.entities.Attendance.create({
           date: today,
           checkInTime,
           checkInLat: pos.lat,
           checkInLng: pos.lng,
-          status,
         });
         setTodayRecord(rec);
         setRecords(prev => [rec, ...prev]);
-        setSuccessMsg(`✅ Check-in lúc ${checkInTime} thành công! (cách công ty ${Math.round(dist)}m)`);
+        const shiftInfo = rec.shiftName
+          ? ` — ${rec.shiftName} (${rec.shiftStartTime}–${rec.shiftEndTime})`
+          : '';
+        const statusLabel = rec.status === 'late' ? 'Trễ' : 'Đúng giờ';
+        setSuccessMsg(`✅ Check-in lúc ${checkInTime} thành công!${shiftInfo} — ${statusLabel} (cách công ty ${Math.round(dist)}m)`);
       } else {
         const checkOutTime = format(new Date(), 'HH:mm:ss');
         const updated = await base44.entities.Attendance.update(todayRecord.id, {

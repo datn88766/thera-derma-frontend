@@ -100,6 +100,7 @@ export const entities = {
   FooterSettings: createEntityClient('/footer-settings', { singleton: true }),
   AutomatedMessage: createEntityClient('/automated-messages'),
   Attendance: createEntityClient('/attendance'),
+  Shift: createEntityClient('/shifts'),
   LeaveRequest: {
     ...createEntityClient('/leave-requests'),
     async cancel(id) {

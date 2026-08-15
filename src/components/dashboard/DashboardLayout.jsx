@@ -3,12 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import {
   LayoutDashboard, Users, CalendarDays, Package, Settings, Newspaper,
-  MessageSquare, LogOut, Menu, X, ChevronRight, Sparkles, ClipboardCheck, Umbrella, Bell, Mail
+  MessageSquare, LogOut, Menu, X, ChevronRight, Sparkles, ClipboardCheck, Umbrella, Bell, Mail, Clock, ExternalLink
 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { useNotificationStore } from '@/shared/stores/notificationStore';
 import { getBlogAdminUrl, getBlogUrl } from '@/lib/blogUrl';
+import { getAdminUrl, getAttendanceUrl } from '@/lib/subdomainUrl';
 import { auth } from '@/api/entities';
 
 const buildAdminMenu = () => [
@@ -17,12 +18,14 @@ const buildAdminMenu = () => [
   { label: 'Dịch vụ & Sản phẩm', icon: Package, path: '/admin/services' },
   { label: 'Lịch hẹn', icon: CalendarDays, path: '/admin/appointments' },
   { label: 'Liệu trình', icon: Sparkles, path: '/admin/treatments' },
-  { label: 'Blog', icon: Newspaper, path: getBlogAdminUrl(), external: true, sso: true },
+  { label: 'Blog', icon: Newspaper, path: getBlogAdminUrl(), external: true, sso: true, ssoUrlFn: getBlogUrl, ssoNext: '/admin/newsroom' },
   { label: 'Tin nhắn tự động', icon: MessageSquare, path: '/admin/messages' },
   { label: 'Thông báo Email', icon: Mail, path: '/admin/email' },
   { label: 'Chấm công NV', icon: ClipboardCheck, path: '/admin/attendance' },
+  { label: 'Ca làm việc', icon: Clock, path: '/admin/shifts' },
   { label: 'Nghỉ phép', icon: Umbrella, path: '/admin/leave' },
   { label: 'Cài đặt Footer', icon: Settings, path: '/admin/settings' },
+  { label: 'Trang Admin (link riêng)', icon: ExternalLink, path: getAdminUrl(), external: true, sso: true, ssoUrlFn: getAdminUrl, ssoNext: '/admin' },
 ];
 
 const staffMenu = [
@@ -32,6 +35,7 @@ const staffMenu = [
   { label: 'Dịch vụ & Sản phẩm', icon: Package, path: '/staff/services' },
   { label: 'Lịch hẹn', icon: CalendarDays, path: '/staff/appointments' },
   { label: 'Liệu trình KH', icon: Sparkles, path: '/staff/treatments' },
+  { label: 'Chấm công (link riêng)', icon: ExternalLink, path: getAttendanceUrl(), external: true, sso: true, ssoUrlFn: getAttendanceUrl, ssoNext: '/staff/attendance' },
 ];
 
 export default function DashboardLayout({ children, role }) {
@@ -46,15 +50,15 @@ export default function DashboardLayout({ children, role }) {
 
   const currentPageLabel = menu.find((item) => !item.external && location.pathname === item.path)?.label ?? '';
 
-  const handleBlogOpen = async () => {
+  const openSsoLink = async (getUrlFn, next, fallbackUrl) => {
     try {
       const code = await auth.issueCrossDomainCode();
-      const callbackUrl = new URL('/auth/callback', getBlogUrl());
+      const callbackUrl = new URL('/auth/callback', getUrlFn());
       callbackUrl.searchParams.set('code', code);
-      callbackUrl.searchParams.set('next', '/admin/newsroom');
+      callbackUrl.searchParams.set('next', next);
       window.open(callbackUrl.toString(), '_blank', 'noopener,noreferrer');
     } catch {
-      window.open(getBlogAdminUrl(), '_blank', 'noopener,noreferrer');
+      window.open(fallbackUrl ?? getUrlFn(), '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -73,7 +77,7 @@ export default function DashboardLayout({ children, role }) {
 
       <aside className={cn(
         // Giảm sidebar để fit viewport ~1152px (MacBook 12), vẫn nới ở màn lớn hơn
-        "fixed top-0 left-0 h-full w-[220px] iosMax:w-[240px] xl:w-64 bg-foreground text-background z-40 flex flex-col transition-transform duration-300",
+        "fixed top-0 left-0 h-full w-[220px] xl:w-64 bg-foreground text-background z-40 flex flex-col transition-transform duration-300",
         sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       )}>
         <div className="p-6 border-b border-background/10">
@@ -95,7 +99,12 @@ export default function DashboardLayout({ children, role }) {
             if (item.external) {
               if (item.sso) {
                 return (
-                  <button key={item.path} type="button" onClick={handleBlogOpen} className={className}>
+                  <button
+                    key={item.path}
+                    type="button"
+                    onClick={() => openSsoLink(item.ssoUrlFn, item.ssoNext, item.path)}
+                    className={className}
+                  >
                     <item.icon size={18} />
                     {item.label}
                   </button>
@@ -135,7 +144,7 @@ export default function DashboardLayout({ children, role }) {
         </div>
       </aside>
 
-      <div className="flex-1 w-full min-w-0 lg:ml-[220px] iosMax:ml-[240px] xl:ml-64 flex flex-col min-h-screen">
+      <div className="flex-1 w-full min-w-0 lg:ml-[220px] xl:ml-64 flex flex-col min-h-screen">
         <header className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border px-4 iosMini:px-3 iosStd:px-3 iosPro:px-3 lg:px-6 py-3 flex items-center gap-4">
           <button
             className="lg:hidden p-2 rounded-lg hover:bg-muted"

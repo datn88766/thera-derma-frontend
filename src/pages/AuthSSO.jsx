@@ -3,12 +3,15 @@ import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { auth } from '@/api/entities';
 import { getBlogUrl } from '@/lib/blogUrl';
+import { getAdminUrl, getAttendanceUrl } from '@/lib/subdomainUrl';
 
 function isTrustedReturnTo(url) {
   try {
     const parsed = new URL(url);
-    const blogOrigin = new URL(getBlogUrl()).origin;
-    return parsed.origin === blogOrigin;
+    const trustedOrigins = [getBlogUrl(), getAdminUrl(), getAttendanceUrl()].map(
+      (u) => new URL(u).origin,
+    );
+    return trustedOrigins.includes(parsed.origin);
   } catch {
     return false;
   }

@@ -24,7 +24,7 @@ const statusConfig = {
 export default function StatusBadge({ status }) {
   const config = statusConfig[status] || { label: status, class: 'bg-muted text-muted-foreground' };
   return (
-    <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium', config.class)}>
+    <span className={cn('shrink-0 whitespace-nowrap px-2.5 py-0.5 rounded-full text-xs font-medium', config.class)}>
       {config.label}
     </span>
   );

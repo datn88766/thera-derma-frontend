@@ -242,6 +242,7 @@ function AttendanceSlider({ employee, onClose }) {
                         </p>
                         <p className="text-xs text-muted-foreground mt-0.5">
                           Vào: {rec.checkInTime?.slice(0,5) || '—'} · Ra: {rec.checkOutTime?.slice(0,5) || '—'}
+                          {rec.shiftName ? ` · ${rec.shiftName}` : ''}
                         </p>
                       </div>
                       <StatusChip status={rec.status} />

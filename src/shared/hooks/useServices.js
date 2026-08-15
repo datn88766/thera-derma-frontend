@@ -9,6 +9,14 @@ export function useServices(limit = 50) {
   });
 }
 
+export function useTreatments(limit = 50) {
+  return useQuery({
+    queryKey: ['treatments', limit],
+    queryFn: () => base44.entities.Treatment.list('-created_date', limit),
+    staleTime: 60_000,
+  });
+}
+
 export function useFooterSettings() {
   return useQuery({
     queryKey: ['footer-settings'],

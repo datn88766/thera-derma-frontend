@@ -10,11 +10,13 @@ import NotificationProvider from '@/shared/providers/NotificationProvider';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Home from './pages/Home';
 import { getBlogUrl } from '@/lib/blogUrl';
+import { isAdminHostname, isAttendanceHostname } from '@/lib/subdomainUrl';
 
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const GoogleAuthCallback = lazy(() => import('./pages/GoogleAuthCallback'));
 const AuthSSO = lazy(() => import('./pages/AuthSSO'));
+const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 const Unauthorized = lazy(() => import('./pages/Unauthorized'));
 const ServiceDetail = lazy(() => import('./pages/ServiceDetail'));
 const CustomerDashboard = lazy(() => import('./pages/customer/CustomerDashboard'));
@@ -31,6 +33,7 @@ const AdminMessages = lazy(() => import('./pages/admin/AdminMessages'));
 const AdminEmailNotifications = lazy(() => import('./pages/admin/AdminEmailNotifications'));
 const AdminAttendance = lazy(() => import('./pages/admin/AdminAttendance'));
 const AdminLeave = lazy(() => import('./pages/admin/AdminLeave'));
+const AdminShiftSettings = lazy(() => import('./pages/admin/AdminShiftSettings'));
 
 function PageLoader() {
   return (
@@ -49,12 +52,13 @@ function App() {
             <Router>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
-                  <Route path="/" element={<Home />} />
+                  <Route path="/" element={<RootRoute />} />
                   <Route path="/service" element={<ServiceDetail />} />
                   <Route path="/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
                   <Route path="/auth/sso" element={<AuthSSO />} />
+                  <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/unauthorized" element={<Unauthorized />} />
                   <Route path="/blog" element={<BlogRedirect />} />
                   <Route path="/blog/*" element={<BlogRedirect />} />
@@ -86,6 +90,7 @@ function App() {
                     <Route path="/admin/email" element={<AdminEmailNotifications />} />
                     <Route path="/admin/attendance" element={<AdminAttendance />} />
                     <Route path="/admin/leave" element={<AdminLeave />} />
+                    <Route path="/admin/shifts" element={<AdminShiftSettings />} />
                   </Route>
 
                   <Route path="*" element={<PageNotFound />} />
@@ -103,6 +108,13 @@ function App() {
 function BlogRedirect() {
   window.location.href = getBlogUrl();
   return null;
+}
+
+function RootRoute() {
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  if (isAdminHostname(hostname)) return <Navigate to="/admin" replace />;
+  if (isAttendanceHostname(hostname)) return <Navigate to="/staff/attendance" replace />;
+  return <Home />;
 }
 
 export default App;

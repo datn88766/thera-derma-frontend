@@ -5,6 +5,8 @@ import { useLang } from '@/lib/LanguageContext';
 import { useAuth } from '@/lib/AuthContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getBlogUrl } from '@/lib/blogUrl';
+import { COMPANY_LAT, COMPANY_LNG } from '@/lib/geolocation';
+import { useFooterSettings } from '@/shared/hooks/useServices';
 
 const SECTION_IDS = ['hero', 'services', 'academy', 'philosophy', 'contact'];
 
@@ -16,6 +18,7 @@ const LABELS = {
     philosophy: 'Philosophy',
     contact: 'Contact',
     blog: 'Blog',
+    directions: 'Directions',
     signIn: 'Sign In',
     book: 'Book Consultation',
     dashboard: 'Dashboard',
@@ -29,6 +32,7 @@ const LABELS = {
     philosophy: 'Triết lý',
     contact: 'Liên hệ',
     blog: 'Blog',
+    directions: 'Chỉ đường',
     signIn: 'Đăng nhập',
     book: 'Đặt lịch tư vấn',
     dashboard: 'Dashboard',
@@ -36,6 +40,8 @@ const LABELS = {
     logout: 'Đăng xuất',
   },
 };
+
+const fallbackDirectionsUrl = `https://www.google.com/maps/search/?api=1&query=${COMPANY_LAT},${COMPANY_LNG}`;
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -51,6 +57,11 @@ export default function Navbar() {
   const isBlog = location.pathname.startsWith('/blog');
   const labels = LABELS[lang] || LABELS.en;
   const blogUrl = getBlogUrl();
+  const { data: footerSettings } = useFooterSettings();
+  const address = footerSettings?.address?.trim();
+  const directionsUrl = address
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`
+    : fallbackDirectionsUrl;
 
   const dashboardPath =
     user?.role === 'admin'
@@ -68,6 +79,7 @@ export default function Navbar() {
     { key: 'philosophy', href: '#philosophy' },
     { key: 'contact', href: '#contact' },
     { key: 'blog', href: blogUrl, route: true, external: true },
+    { key: 'directions', href: directionsUrl, route: true, external: true, newTab: true },
   ];
 
   const updateScroll = useCallback(() => {
@@ -116,6 +128,8 @@ export default function Navbar() {
   };
 
   const isLinkActive = (link) => {
+    if (link.key === 'blog') return isBlog;
+    if (link.newTab) return false;
     if (link.route) return isBlog;
     if (!isHome) return false;
     return activeSection === link.href.replace('#', '');
@@ -133,7 +147,12 @@ export default function Navbar() {
       } ${active ? 'text-foreground' : 'text-foreground/55 hover:text-foreground'}`;
       if (link.external) {
         return (
-          <a href={link.href} onClick={() => setMobileOpen(false)} className={className}>
+          <a
+            href={link.href}
+            onClick={() => setMobileOpen(false)}
+            className={className}
+            {...(link.newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+          >
             <span className="relative z-10">{label}</span>
           </a>
         );

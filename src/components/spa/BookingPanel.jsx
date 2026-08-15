@@ -1,16 +1,18 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
-import { Calendar as CalendarIcon, ArrowRight, Check } from 'lucide-react';
+import { Calendar as CalendarIcon, ArrowRight, Check, ImagePlus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLang } from '@/lib/LanguageContext';
 import { base44 } from '@/api/entities';
 import { useServices } from '@/shared/hooks/useServices';
+import { uploadAppointmentPhoto } from '@/lib/mediaUpload';
 
 const timeSlots = [
   '10:00 AM', '11:00 AM', '12:00 PM', '1:00 PM',
@@ -30,9 +32,16 @@ export default function BookingPanel({ bgImage }) {
   const { t } = useLang();
   const { data: services, isLoading: servicesLoading } = useServices(200);
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({ name: '', email: '', phone: '', serviceId: '', date: null, time: '' });
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '', serviceId: '',
+    date: null, time: '', skinCondition: '',
+  });
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState('');
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
 
   const bookableServices = useMemo(() => {
     if (!services?.length) return [];
@@ -42,6 +51,19 @@ export default function BookingPanel({ bgImage }) {
   }, [services]);
 
   const selectedService = bookableServices.find((s) => s.id === form.serviceId);
+
+  const handlePhotoSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  };
+
+  const removePhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
 
   const handleSubmit = async () => {
     if (!form.name || !form.phone || !form.serviceId || !form.date || !form.time) {
@@ -55,6 +77,12 @@ export default function BookingPanel({ bgImage }) {
     }
     setSubmitting(true);
     try {
+      let photoUrl = '';
+      if (photoFile) {
+        setPhotoUploading(true);
+        photoUrl = await uploadAppointmentPhoto(photoFile);
+        setPhotoUploading(false);
+      }
       await base44.entities.Appointment.create({
         customerName: form.name,
         ...(form.email ? { customerEmail: form.email } : {}),
@@ -62,12 +90,15 @@ export default function BookingPanel({ bgImage }) {
         serviceNames: [serviceName],
         date: format(form.date, 'yyyy-MM-dd'),
         time: to24h(form.time),
+        ...(form.skinCondition ? { skinCondition: form.skinCondition } : {}),
+        ...(photoUrl ? { photoUrl } : {}),
       });
       setSubmitted(true);
       toast.success(t.booking.successMsg);
     } catch (error) {
       toast.error(error.message || t.booking.errorRequired);
     } finally {
+      setPhotoUploading(false);
       setSubmitting(false);
     }
   };
@@ -264,6 +295,53 @@ export default function BookingPanel({ bgImage }) {
                   </div>
                 </div>
 
+                <div>
+                  <label className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-medium mb-3 block">
+                    {t.booking.skinCondition}
+                  </label>
+                  <Textarea
+                    value={form.skinCondition}
+                    onChange={(e) => setForm({ ...form, skinCondition: e.target.value })}
+                    placeholder={t.booking.skinConditionPlaceholder}
+                    className="min-h-24 bg-background border-border/60 font-body"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs tracking-[0.15em] uppercase text-muted-foreground font-medium mb-3 block">
+                    {t.booking.photo}
+                  </label>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoSelect}
+                    className="hidden"
+                  />
+                  {photoPreview ? (
+                    <div className="relative w-32 h-32">
+                      <img src={photoPreview} alt="" className="w-full h-full object-cover rounded-md border border-border/60" />
+                      <button
+                        type="button"
+                        onClick={removePhoto}
+                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-foreground text-background flex items-center justify-center"
+                        aria-label={t.booking.photoRemove}
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="flex items-center gap-2 h-12 px-4 border border-dashed border-border/60 text-sm text-muted-foreground hover:border-foreground/30 transition-colors duration-300"
+                    >
+                      <ImagePlus size={16} />
+                      {t.booking.photoHint}
+                    </button>
+                  )}
+                </div>
+
                 <div className="flex gap-4">
                   <Button
                     variant="outline"
@@ -277,7 +355,7 @@ export default function BookingPanel({ bgImage }) {
                     disabled={submitting}
                     className="flex-1 h-12 bg-foreground text-background hover:bg-primary font-medium tracking-widest uppercase text-sm transition-all duration-500 disabled:opacity-60"
                   >
-                    {submitting ? '...' : t.booking.submit}
+                    {submitting ? (photoUploading ? t.booking.photoUploading : '...') : t.booking.submit}
                   </Button>
                 </div>
               </div>

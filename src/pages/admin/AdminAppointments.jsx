@@ -7,9 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
-import { Search, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Search, Plus, Pencil, Trash2, Eye, ImageIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { DashboardMobileList, DashboardMobileCard } from '@/components/dashboard/MobileDataCard';
+import { resolveMediaUrl } from '@/lib/mediaUpload';
 
 const emptyForm = {
   customerMode: 'existing',
@@ -31,6 +32,7 @@ const emptyForm = {
 export default function AdminAppointments({ role = 'admin' }) {
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
+  const [treatments, setTreatments] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -39,19 +41,25 @@ export default function AdminAppointments({ role = 'admin' }) {
   const [form, setForm] = useState(emptyForm);
   const [editId, setEditId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [viewItem, setViewItem] = useState(null);
 
   const load = async () => {
-    const [appts, svcs, custResult] = await Promise.all([
+    const [appts, svcs, trts, custResult] = await Promise.all([
       base44.entities.Appointment.list('-date', 100),
       base44.entities.Service.list('-created_date', 100),
+      base44.entities.Treatment.list('-created_date', 200),
       base44.entities.Customer.filter({ limit: 200 }, '-created_date'),
     ]);
     setAppointments(appts);
     setServices(Array.isArray(svcs) ? svcs : []);
+    setTreatments(Array.isArray(trts) ? trts : []);
     setCustomers(Array.isArray(custResult) ? custResult : custResult?.items ?? []);
     setLoading(false);
   };
   useEffect(() => { load(); }, []);
+
+  const treatmentName = (treatmentId) =>
+    treatments.find((tr) => tr.id === treatmentId)?.name || '';
 
   const filtered = appointments.filter(a => {
     const matchSearch = (a.customerName || '').toLowerCase().includes(search.toLowerCase()) ||
@@ -234,6 +242,7 @@ export default function AdminAppointments({ role = 'admin' }) {
               badges={<StatusBadge status={a.status} />}
               meta={[
                 { label: 'Dịch vụ', value: a.serviceNames?.join(', ') || '—', full: true },
+                ...(a.treatmentId ? [{ label: 'Liệu trình', value: treatmentName(a.treatmentId) || '—', full: true }] : []),
                 { label: 'Ngày', value: a.date },
                 { label: 'Giờ', value: a.time },
               ]}
@@ -250,6 +259,7 @@ export default function AdminAppointments({ role = 'admin' }) {
                       <SelectItem value="cancelled">Đã hủy</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Button variant="ghost" size="sm" onClick={() => setViewItem(a)}><Eye size={14} /></Button>
                   <Button variant="ghost" size="sm" onClick={() => openEdit(a)}><Pencil size={14} /></Button>
                   <Button variant="ghost" size="sm" className="text-destructive ml-auto" onClick={() => handleDelete(a.id)}><Trash2 size={14} /></Button>
                 </>
@@ -277,7 +287,17 @@ export default function AdminAppointments({ role = 'admin' }) {
                     <p className="text-sm font-medium">{a.customerName}</p>
                     <p className="text-xs text-muted-foreground">{a.customerPhoneNumber}</p>
                   </td>
-                  <td className="px-4 py-3 text-sm text-muted-foreground">{a.serviceNames?.join(', ') || '—'}</td>
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
+                    <p>{a.serviceNames?.join(', ') || '—'}</p>
+                    {a.treatmentId && (
+                      <p className="text-xs text-primary mt-0.5">{treatmentName(a.treatmentId) || 'Liệu trình'}</p>
+                    )}
+                    {a.photoUrl && (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                        <ImageIcon size={12} /> Có ảnh
+                      </span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-sm">{a.date} <span className="text-muted-foreground">{a.time}</span></td>
                   <td className="px-4 py-3">
                     <Select value={a.status} onValueChange={v => updateStatus(a.id, v)}>
@@ -293,6 +313,7 @@ export default function AdminAppointments({ role = 'admin' }) {
                     </Select>
                   </td>
                   <td className="px-4 py-3 flex gap-1">
+                    <Button variant="ghost" size="icon" onClick={() => setViewItem(a)}><Eye size={14} /></Button>
                     <Button variant="ghost" size="icon" onClick={() => openEdit(a)}><Pencil size={14} /></Button>
                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDelete(a.id)}><Trash2 size={14} /></Button>
                   </td>
@@ -474,6 +495,62 @@ export default function AdminAppointments({ role = 'admin' }) {
             <Button type="button" onClick={handleSave} disabled={saving} className="bg-primary text-primary-foreground">
               {saving ? 'Đang lưu...' : 'Lưu'}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!viewItem} onOpenChange={(open) => !open && setViewItem(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-heading italic text-2xl">Chi tiết lịch hẹn</DialogTitle>
+            <DialogDescription className="sr-only">Thông tin khách hàng gửi kèm lịch hẹn</DialogDescription>
+          </DialogHeader>
+          {viewItem && (
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="font-medium">{viewItem.customerName}</p>
+                <p className="text-xs text-muted-foreground">{viewItem.customerPhoneNumber} {viewItem.customerEmail ? `• ${viewItem.customerEmail}` : ''}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">Dịch vụ</p>
+                <p>{viewItem.serviceNames?.join(', ') || '—'}</p>
+              </div>
+              {viewItem.treatmentId && (
+                <div>
+                  <p className="text-xs text-muted-foreground">Liệu trình</p>
+                  <p>{treatmentName(viewItem.treatmentId) || '—'}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-muted-foreground">Ngày & giờ</p>
+                <p>{viewItem.date} lúc {viewItem.time}</p>
+              </div>
+              {viewItem.skinCondition && (
+                <div>
+                  <p className="text-xs text-muted-foreground">Mô tả tình trạng da</p>
+                  <p className="whitespace-pre-wrap">{viewItem.skinCondition}</p>
+                </div>
+              )}
+              {viewItem.photoUrl && (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">Ảnh tình trạng da</p>
+                  <img
+                    src={resolveMediaUrl(viewItem.photoUrl)}
+                    alt=""
+                    className="w-full max-h-64 object-contain rounded-md border border-border"
+                  />
+                </div>
+              )}
+              {viewItem.notes && (
+                <div>
+                  <p className="text-xs text-muted-foreground">Ghi chú</p>
+                  <p className="whitespace-pre-wrap">{viewItem.notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setViewItem(null)}>Đóng</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

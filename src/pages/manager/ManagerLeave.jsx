@@ -100,27 +100,27 @@ export default function ManagerLeave() {
     <DashboardLayout role="staff">
       <div className="max-w-3xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
             <h1 className="text-2xl font-bold text-foreground">Nghỉ phép</h1>
             <p className="text-sm text-muted-foreground mt-1">Gửi và theo dõi đơn xin nghỉ phép của bạn</p>
           </div>
-          <Button onClick={() => setShowForm(v => !v)} className="flex items-center gap-2">
+          <Button onClick={() => setShowForm(v => !v)} className="w-full sm:w-auto flex items-center justify-center gap-2">
             <Plus size={16} /> Xin nghỉ phép
           </Button>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-card border border-border rounded-xl p-4 text-center">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          <div className="bg-card border border-border rounded-xl p-3 sm:p-4 text-center">
             <p className="text-2xl font-bold text-yellow-600">{pendingCount}</p>
             <p className="text-xs text-muted-foreground mt-1">Chờ duyệt</p>
           </div>
-          <div className="bg-card border border-border rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-3 sm:p-4 text-center">
             <p className="text-2xl font-bold text-green-600">{approvedDays}</p>
             <p className="text-xs text-muted-foreground mt-1">Ngày đã được duyệt</p>
           </div>
-          <div className="bg-card border border-border rounded-xl p-4 text-center">
+          <div className="bg-card border border-border rounded-xl p-3 sm:p-4 text-center">
             <p className="text-2xl font-bold text-foreground">{requests.length}</p>
             <p className="text-xs text-muted-foreground mt-1">Tổng đơn</p>
           </div>
@@ -133,25 +133,25 @@ export default function ManagerLeave() {
               initial={{ opacity: 0, y: -12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
-              className="bg-card border border-border rounded-2xl p-6 shadow-sm"
+              className="bg-card border border-border rounded-2xl p-4 sm:p-6 shadow-sm"
             >
               <h2 className="font-semibold text-foreground mb-4 flex items-center gap-2">
                 <Umbrella size={16} className="text-primary" /> Đơn xin nghỉ phép mới
               </h2>
               <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="min-w-0">
                     <label className="text-xs font-medium text-muted-foreground block mb-1.5">Từ ngày *</label>
                     <input type="date" required value={form.startDate}
                       onChange={e => setForm(f => ({ ...f, startDate: e.target.value }))}
-                      className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:border-primary"
+                      className="block w-full min-w-0 max-w-full appearance-none border border-border rounded-lg px-3 py-2 text-base sm:text-sm bg-background focus:outline-none focus:border-primary"
                     />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <label className="text-xs font-medium text-muted-foreground block mb-1.5">Đến ngày *</label>
                     <input type="date" required value={form.endDate} min={form.startDate}
                       onChange={e => setForm(f => ({ ...f, endDate: e.target.value }))}
-                      className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:border-primary"
+                      className="block w-full min-w-0 max-w-full appearance-none border border-border rounded-lg px-3 py-2 text-base sm:text-sm bg-background focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
@@ -177,9 +177,9 @@ export default function ManagerLeave() {
                     className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:border-primary resize-none"
                   />
                 </div>
-                <div className="flex gap-2 justify-end pt-1">
-                  <Button type="button" variant="outline" onClick={() => setShowForm(false)}>Huỷ</Button>
-                  <Button type="submit" disabled={submitting} className="flex items-center gap-2">
+                <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end pt-1">
+                  <Button type="button" variant="outline" onClick={() => setShowForm(false)} className="w-full sm:w-auto">Huỷ</Button>
+                  <Button type="submit" disabled={submitting} className="w-full sm:w-auto flex items-center justify-center gap-2">
                     {submitting && <Loader2 size={14} className="animate-spin" />} Gửi đơn
                   </Button>
                 </div>
@@ -204,12 +204,12 @@ export default function ManagerLeave() {
               {requests.map(req => (
                 <div key={req.id}>
                   <button
-                    className="w-full flex items-center justify-between px-5 py-4 hover:bg-muted/30 transition-colors text-left"
+                    className="w-full flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-4 sm:px-5 py-4 hover:bg-muted/30 transition-colors text-left"
                     onClick={() => setExpandedId(expandedId === req.id ? null : req.id)}
                   >
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 min-w-0 w-full">
                       <Umbrella size={15} className="text-primary mt-0.5 flex-shrink-0" />
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-sm font-medium text-foreground">
                           {LEAVE_TYPE_LABEL[req.leaveType]} · {req.totalDays} ngày
                         </p>
@@ -218,7 +218,7 @@ export default function ManagerLeave() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
                       <StatusChip status={req.status} />
                       {expandedId === req.id ? <ChevronUp size={14} className="text-muted-foreground" /> : <ChevronDown size={14} className="text-muted-foreground" />}
                     </div>
