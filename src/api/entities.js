@@ -171,9 +171,6 @@ export const auth = {
       params.set('origin', window.location.origin);
     }
     const query = params.toString();
-    if (typeof window !== 'undefined') {
-      return `${window.location.origin}/api/auth/google${query ? `?${query}` : ''}`;
-    }
     return buildApiUrl(`/auth/google${query ? `?${query}` : ''}`);
   },
 
