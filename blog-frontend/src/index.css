@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-heading: 'Cormorant Garamond', serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-nav: 'Inter', system-ui, sans-serif;
+    --sage: #C9D8CF;
+    --sage-dark: #3d4a42;
+
+    --background: 40 20% 97%;
+    --foreground: 0 0% 10%;
+    --card: 40 20% 97%;
+    --card-foreground: 0 0% 10%;
+    --popover: 40 20% 97%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 144 10% 57%;
+    --primary-foreground: 40 20% 97%;
+    --secondary: 28 22% 78%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 30 15% 92%;
+    --muted-foreground: 144 10% 47%;
+    --accent: 28 22% 78%;
+    --accent-foreground: 0 0% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 28 22% 82%;
+    --input: 28 22% 82%;
+    --ring: 144 10% 57%;
+    --chart-1: 144 10% 57%;
+    --chart-2: 28 22% 78%;
+    --chart-3: 40 20% 60%;
+    --chart-4: 144 15% 45%;
+    --chart-5: 28 30% 65%;
+    --radius: 0.25rem;
+    --sidebar-background: 40 20% 95%;
+    --sidebar-foreground: 0 0% 10%;
+    --sidebar-primary: 144 10% 57%;
+    --sidebar-primary-foreground: 40 20% 97%;
+    --sidebar-accent: 28 22% 78%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 28 22% 82%;
+    --sidebar-ring: 144 10% 57%;
+  }
+
+  .dark {
+    --background: 0 0% 6%;
+    --foreground: 40 20% 95%;
+    --card: 0 0% 8%;
+    --card-foreground: 40 20% 95%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 40 20% 95%;
+    --primary: 144 10% 57%;
+    --primary-foreground: 0 0% 6%;
+    --secondary: 28 15% 25%;
+    --secondary-foreground: 40 20% 95%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 144 8% 55%;
+    --accent: 28 15% 25%;
+    --accent-foreground: 40 20% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 144 10% 57%;
+    --chart-1: 144 10% 57%;
+    --chart-2: 28 22% 50%;
+    --chart-3: 40 20% 40%;
+    --chart-4: 144 15% 45%;
+    --chart-5: 28 30% 45%;
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 40 20% 95%;
+    --sidebar-primary: 144 10% 57%;
+    --sidebar-primary-foreground: 0 0% 6%;
+    --sidebar-accent: 28 15% 25%;
+    --sidebar-accent-foreground: 40 20% 95%;
+    --sidebar-border: 0 0% 18%;
+    --sidebar-ring: 144 10% 57%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    font-size: clamp(16px, 15.3px + 0.25vw, 17px);
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Micro-tiers for iPhone widths (polish only). */
+@media (min-width: 360px) and (max-width: 389px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 390px) and (max-width: 429px) {
+  html {
+    font-size: 16.5px;
+  }
+}
+
+@media (min-width: 430px) and (max-width: 767px) {
+  html {
+    font-size: 17px;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: hsl(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.3);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.5);
+}
+
+@layer utilities {
+  /* Layout helpers (mobile-first) */
+  .page-x {
+    @apply px-4 ios16Max:px-5 sm:px-6 lg:px-10;
+  }
+
+  .section-y {
+    @apply py-10 sm:py-12 lg:py-16;
+  }
+
+  .section-gap {
+    @apply gap-8 sm:gap-10 lg:gap-14;
+  }
+
+  /* Typography presets (use instead of ad-hoc text-[..] where possible) */
+  .t-hero {
+    @apply font-heading font-extrabold leading-[1.05] tracking-tight;
+    font-size: clamp(2.1rem, 1.35rem + 2.1vw, 3.25rem);
+  }
+
+  .t-h1 {
+    @apply font-heading font-bold leading-[1.12] tracking-tight;
+    font-size: clamp(1.75rem, 1.2rem + 1.35vw, 2.5rem);
+  }
+
+  .t-h2 {
+    @apply font-heading font-bold leading-[1.18] tracking-tight;
+    font-size: clamp(1.45rem, 1.12rem + 0.85vw, 2rem);
+  }
+
+  .t-body {
+    @apply font-body leading-relaxed text-foreground/90;
+    font-size: clamp(1rem, 0.98rem + 0.15vw, 1.0625rem);
+  }
+
+  .t-small {
+    @apply font-body leading-snug text-muted-foreground;
+    font-size: 0.9375rem;
+  }
+
+  .tap {
+    min-height: 44px;
+  }
+
+  .luxury-glass {
+    background: rgba(248, 246, 242, 0.72);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 12px 40px rgba(30, 27, 23, 0.08),
+      0 1px 0 rgba(255, 255, 255, 0.65) inset;
+  }
+
+  .luxury-glass-panel {
+    background: rgba(248, 246, 242, 0.96);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    box-shadow:
+      0 16px 48px rgba(30, 27, 23, 0.1),
+      0 1px 0 rgba(255, 255, 255, 0.8) inset;
+  }
+
+  .navbar-glass {
+    background: rgba(255, 252, 248, 0.62);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 4px 24px rgba(26, 26, 26, 0.06),
+      0 1px 0 rgba(255, 255, 255, 0.6) inset;
+  }
+
+  .navbar-glass-scrolled {
+    background: rgba(255, 252, 248, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    box-shadow:
+      0 8px 32px rgba(26, 26, 26, 0.09),
+      0 1px 0 rgba(255, 255, 255, 0.75) inset;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  /* System-level overflow guards (mobile-first). */
+  html,
+  body {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  img,
+  video,
+  iframe,
+  svg {
+    max-width: 100%;
+  }
+
+  img,
+  video {
+    height: auto;
+  }
+
+  a,
+  p,
+  li,
+  span {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  pre,
+  code {
+    max-width: 100%;
+  }
+
+  pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent horizontal overflow in rich article HTML (mobile first). */
+  .article-content {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .article-content img,
+  .article-content video,
+  .article-content iframe,
+  .article-content svg {
+    max-width: 100%;
+  }
+
+  .article-content img,
+  .article-content video {
+    height: auto;
+  }
+
+  .article-content pre,
+  .article-content code {
+    max-width: 100%;
+  }
+
+  .article-content pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .article-content table {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .article-content a {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}

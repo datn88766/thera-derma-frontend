@@ -3,7 +3,7 @@ import { defineConfig } from 'vite';
 import path from 'path';
 import fs from 'fs';
 
-const blogSrc = path.resolve(__dirname, '../blog-frontend/src');
+const blogSrc = path.resolve(__dirname, './blog-frontend/src');
 const appSrc = path.resolve(__dirname, './src');
 
 function resolveWithExtensions(basePath) {

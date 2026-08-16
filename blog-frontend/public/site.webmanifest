@@ -1,0 +1,16 @@
+{
+  "name": "Thera Derma Blog",
+  "short_name": "TheraDerma",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F6F2",
+  "theme_color": "#A9B8AE",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
+
