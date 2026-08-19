@@ -17,6 +17,7 @@ import {
   AlertTriangle, Loader2, Calendar, TrendingUp,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import ShiftSelectDialog from '@/components/attendance/ShiftSelectDialog';
 
 function StatusBadge({ status }) {
   const map = {
@@ -128,6 +129,7 @@ export default function ManagerAttendance() {
   const [locPermission, setLocPermission] = useState('unknown');
   const [successMsg, setSuccessMsg] = useState('');
   const [now, setNow]               = useState(new Date());
+  const [shiftDialogOpen, setShiftDialogOpen] = useState(false);
 
   const today = format(new Date(), 'yyyy-MM-dd');
 
@@ -183,7 +185,7 @@ export default function ManagerAttendance() {
     }
   };
 
-  const doAttendance = async (action) => {
+  const doAttendance = async (action, shift) => {
     setLocError('');
     setSuccessMsg('');
     setLocLoading(true);
@@ -211,14 +213,16 @@ export default function ManagerAttendance() {
           checkInTime,
           checkInLat: pos.lat,
           checkInLng: pos.lng,
+          shiftId: shift.id,
         });
         setTodayRecord(rec);
         setRecords(prev => [rec, ...prev]);
         const shiftInfo = rec.shiftName
           ? ` — ${rec.shiftName} (${rec.shiftStartTime}–${rec.shiftEndTime})`
-          : '';
+          : ` — ${shift.name} (${shift.startTime.slice(0, 5)}–${shift.endTime.slice(0, 5)})`;
         const statusLabel = rec.status === 'late' ? 'Trễ' : 'Đúng giờ';
         setSuccessMsg(`✅ Check-in lúc ${checkInTime} thành công!${shiftInfo} — ${statusLabel} (cách công ty ${Math.round(dist)}m)`);
+        setShiftDialogOpen(false);
       } else {
         const checkOutTime = format(new Date(), 'HH:mm:ss');
         const updated = await base44.entities.Attendance.update(todayRecord.id, {
@@ -285,7 +289,7 @@ export default function ManagerAttendance() {
             {/* Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 md:ml-auto w-full md:w-auto">
               <Button
-                onClick={() => doAttendance('in')}
+                onClick={() => setShiftDialogOpen(true)}
                 disabled={!canCheckIn || locLoading || !locReady}
                 className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-5 rounded-xl disabled:opacity-40"
               >
@@ -401,6 +405,13 @@ export default function ManagerAttendance() {
           )}
         </div>
       </div>
+
+      <ShiftSelectDialog
+        open={shiftDialogOpen}
+        onOpenChange={setShiftDialogOpen}
+        onConfirm={(shift) => doAttendance('in', shift)}
+        submitting={locLoading}
+      />
     </DashboardLayout>
   );
 }
