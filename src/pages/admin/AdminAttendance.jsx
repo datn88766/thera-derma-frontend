@@ -67,6 +67,7 @@ function ManualAttendanceModal({ isOpen, onClose, users, initialUser, initialDat
       setUserId(initialUser?.id || (users[0]?.id ?? ''));
       setDate(initialDate || format(new Date(), 'yyyy-MM-dd'));
       setStatus('present');
+      setCheckOutTime('');
       setError('');
       base44.entities.Shift.list()
         .then(res => {
@@ -76,15 +77,12 @@ function ManualAttendanceModal({ isOpen, onClose, users, initialUser, initialDat
             const first = list[0];
             setShiftId(first.id);
             if (first.startTime) setCheckInTime(first.startTime.slice(0, 5));
-            if (first.endTime) setCheckOutTime(first.endTime.slice(0, 5));
           } else {
             setCheckInTime('08:00');
-            setCheckOutTime('17:00');
           }
         })
         .catch(() => {
           setCheckInTime('08:00');
-          setCheckOutTime('17:00');
         });
     }
   }, [isOpen, initialUser, initialDate, users]);
@@ -218,11 +216,12 @@ function ManualAttendanceModal({ isOpen, onClose, users, initialUser, initialDat
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-muted-foreground mb-1">Giờ ra</label>
+              <label className="block text-xs font-semibold text-muted-foreground mb-1">Giờ ra <span className="font-normal opacity-60">(không bắt buộc)</span></label>
               <input
                 type="time"
                 value={checkOutTime}
                 onChange={e => setCheckOutTime(e.target.value)}
+                placeholder="--:--"
                 className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-background focus:outline-none focus:border-primary"
               />
             </div>
@@ -240,7 +239,6 @@ function ManualAttendanceModal({ isOpen, onClose, users, initialUser, initialDat
                   const selectedShift = shifts.find(s => s.id === val);
                   if (selectedShift) {
                     if (selectedShift.startTime) setCheckInTime(selectedShift.startTime.slice(0, 5));
-                    if (selectedShift.endTime) setCheckOutTime(selectedShift.endTime.slice(0, 5));
                   }
                 }}
                 className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-background focus:outline-none focus:border-primary"
