@@ -99,7 +99,15 @@ export const entities = {
   },
   FooterSettings: createEntityClient('/footer-settings', { singleton: true }),
   AutomatedMessage: createEntityClient('/automated-messages'),
-  Attendance: createEntityClient('/attendance'),
+  Attendance: {
+    ...createEntityClient('/attendance'),
+    async createManual(data) {
+      return apiRequest('/attendance/admin/manual', {
+        method: 'POST',
+        body: data,
+      });
+    },
+  },
   Shift: createEntityClient('/shifts'),
   LeaveRequest: {
     ...createEntityClient('/leave-requests'),
