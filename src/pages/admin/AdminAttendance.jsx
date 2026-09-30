@@ -67,16 +67,25 @@ function ManualAttendanceModal({ isOpen, onClose, users, initialUser, initialDat
       setUserId(initialUser?.id || (users[0]?.id ?? ''));
       setDate(initialDate || format(new Date(), 'yyyy-MM-dd'));
       setStatus('present');
-      setCheckInTime('08:00');
-      setCheckOutTime('17:00');
       setError('');
       base44.entities.Shift.list()
         .then(res => {
           const list = Array.isArray(res) ? res : res?.items ?? [];
           setShifts(list);
-          if (list.length > 0) setShiftId(list[0].id);
+          if (list.length > 0) {
+            const first = list[0];
+            setShiftId(first.id);
+            if (first.startTime) setCheckInTime(first.startTime.slice(0, 5));
+            if (first.endTime) setCheckOutTime(first.endTime.slice(0, 5));
+          } else {
+            setCheckInTime('08:00');
+            setCheckOutTime('17:00');
+          }
         })
-        .catch(() => {});
+        .catch(() => {
+          setCheckInTime('08:00');
+          setCheckOutTime('17:00');
+        });
     }
   }, [isOpen, initialUser, initialDate, users]);
 
@@ -225,7 +234,15 @@ function ManualAttendanceModal({ isOpen, onClose, users, initialUser, initialDat
               <label className="block text-xs font-semibold text-muted-foreground mb-1">Ca làm việc</label>
               <select
                 value={shiftId}
-                onChange={e => setShiftId(e.target.value)}
+                onChange={e => {
+                  const val = e.target.value;
+                  setShiftId(val);
+                  const selectedShift = shifts.find(s => s.id === val);
+                  if (selectedShift) {
+                    if (selectedShift.startTime) setCheckInTime(selectedShift.startTime.slice(0, 5));
+                    if (selectedShift.endTime) setCheckOutTime(selectedShift.endTime.slice(0, 5));
+                  }
+                }}
                 className="w-full px-3 py-2 border border-border rounded-xl text-sm bg-background focus:outline-none focus:border-primary"
               >
                 <option value="">-- Tự động khớp ca --</option>
